@@ -38,9 +38,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, PERMIT_GET).permitAll()
                         .anyRequest().authenticated()
                 )
-                .exceptionHandling(e -> {
-                    e.authenticationEntryPoint(new CustomAuthenticationEntryPoint());
-                })
+                .exceptionHandling(e -> e.authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
                 .build();
     }
 

@@ -1,8 +1,8 @@
 package com.pesonal.FindDogPlz.global.auth;
 
-import com.pesonal.FindDogPlz.domain.Member;
-import com.pesonal.FindDogPlz.domain.MemberAdapter;
-import com.pesonal.FindDogPlz.repository.MemberRepository;
+import com.pesonal.FindDogPlz.member.domain.Member;
+import com.pesonal.FindDogPlz.member.domain.MemberAdapter;
+import com.pesonal.FindDogPlz.member.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

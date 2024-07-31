@@ -1,4 +1,4 @@
-package com.pesonal.FindDogPlz.domain;
+package com.pesonal.FindDogPlz.global.common;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;

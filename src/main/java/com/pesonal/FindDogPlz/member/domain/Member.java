@@ -1,5 +1,6 @@
-package com.pesonal.FindDogPlz.domain;
+package com.pesonal.FindDogPlz.member.domain;
 
+import com.pesonal.FindDogPlz.global.common.BaseDateEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
