@@ -1,5 +1,6 @@
 package com.pesonal.FindDogPlz.global.auth;
 
+import com.pesonal.FindDogPlz.member.dto.TokenInfoDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -20,6 +21,7 @@ public class JwtTokenProvider {
     private final Key key;
     private final UserDetailsServiceImpl userDetailsService;
     private static final long ACCESS_TOKEN_EXPIRE_TIME = 30 * 60 * 1000L;
+    private final String GRANT_TYPE = "Bearer";
 
     public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey, UserDetailsServiceImpl userDetailsService) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
@@ -27,7 +29,7 @@ public class JwtTokenProvider {
         this.userDetailsService = userDetailsService;
     }
 
-    public String generateToken(Authentication authentication) {
+    public TokenInfoDto generateToken(Authentication authentication) {
         String authorities = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.joining(","));
@@ -35,12 +37,13 @@ public class JwtTokenProvider {
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + ACCESS_TOKEN_EXPIRE_TIME);
 
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("authorities", authorities)
                 .setExpiration(expireDate)
                 .signWith(key)
                 .compact();
+        return new TokenInfoDto(GRANT_TYPE, token);
     }
 
     public boolean validateToken(String token) throws JwtException {
