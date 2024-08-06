@@ -1,5 +1,6 @@
 package com.pesonal.FindDogPlz.post.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pesonal.FindDogPlz.global.common.Gender;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -18,7 +19,7 @@ public class FindPostReqDto {
     @NotBlank
     private String features;
 
-    @NotBlank
+    @NotNull
     private Gender gender;
 
     @NotNull
@@ -37,5 +38,6 @@ public class FindPostReqDto {
     private Double findLongitude;
 
     @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime findDate;
 }

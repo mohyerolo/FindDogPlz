@@ -1,5 +1,6 @@
 package com.pesonal.FindDogPlz.post.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pesonal.FindDogPlz.global.common.Gender;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -21,7 +22,7 @@ public class LostPostReqDto {
     @NotBlank
     private String features;
 
-    @NotBlank
+    @NotNull
     private Gender gender;
 
     @NotNull
@@ -31,13 +32,13 @@ public class LostPostReqDto {
     private boolean chip;
 
     @NotBlank
-    private String location;
+    private String lostLocation;
 
     @NotNull
-    private Double LostLatitude;
+    private Double lostLatitude;
 
     @NotNull
-    private Double LostLongitude;
+    private Double lostLongitude;
 
     @NotBlank
     private String finalLocation;
@@ -49,5 +50,10 @@ public class LostPostReqDto {
     private Double finalLongitude;
 
     @NotNull
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lostDate;
+
+    public boolean isLostLocEqualFinalLoc() {
+        return lostLocation.equals(finalLocation);
+    }
 }

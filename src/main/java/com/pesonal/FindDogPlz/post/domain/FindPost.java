@@ -10,6 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -18,7 +20,7 @@ public class FindPost extends BaseDateEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    private Member member;
+    private Member writer;
 
     @NotNull
     private String features;
@@ -37,5 +39,9 @@ public class FindPost extends BaseDateEntity {
     private String location;
 
     @NotNull
-    private Point location_point;
+    @Column(columnDefinition = "point")
+    private Point locPoint;
+
+    @NotNull
+    private LocalDateTime findDate;
 }
