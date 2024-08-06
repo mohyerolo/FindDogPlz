@@ -1,10 +1,13 @@
 package com.pesonal.FindDogPlz.post.application;
 
 import com.pesonal.FindDogPlz.global.common.Gender;
+import com.pesonal.FindDogPlz.global.util.PointParser;
 import com.pesonal.FindDogPlz.member.domain.Member;
-import com.pesonal.FindDogPlz.member.dto.SignUpDto;
 import com.pesonal.FindDogPlz.post.domain.LostPost;
+import com.pesonal.FindDogPlz.post.dto.FinalLocationUpdateDto;
+import com.pesonal.FindDogPlz.post.dto.LostLocationUpdateDto;
 import com.pesonal.FindDogPlz.post.dto.LostPostReqDto;
+import com.pesonal.FindDogPlz.post.dto.LostPostUpdateDto;
 import com.pesonal.FindDogPlz.post.repository.LostPostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,16 +16,17 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
-import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class LostPostServiceTest {
 
     @InjectMocks
@@ -31,18 +35,12 @@ class LostPostServiceTest {
     @Mock
     private LostPostRepository lostPostRepository;
 
-    @Mock
-    private PasswordEncoder passwordEncoder;
-
     private Member member;
+    private LostPost lostPost;
 
     @BeforeEach
-    public void setup() {
-        SignUpDto dto = new SignUpDto("garamId", "password", "garam", "010-1111-1111");
-        member = Member.builder()
-                .signUpDto(dto)
-                .pwEncoder(passwordEncoder)
-                .build();
+    void setup() {
+        member = mock(Member.class);
     }
 
     @Test
@@ -73,4 +71,37 @@ class LostPostServiceTest {
         assertNotEquals(savedLostPost.getLostPoint(), savedLostPost.getFinalPoint());
     }
 
+    @Test
+    void updateLostPost_위치변경() {
+        setLostPost();
+        when(lostPostRepository.findById(any())).thenReturn(Optional.of(lostPost));
+        when(member.getId()).thenReturn(1L);
+
+        String updateFeatures = "특징";
+        String updateFinalLocation = "대전";
+        Double updateFinalLatitude = 40.468873;
+
+        LostPostUpdateDto dto = new LostPostUpdateDto("변경", updateFeatures, Gender.F, true, true, LocalDateTime.now(),
+                new LostLocationUpdateDto("경기도", 37.468873, 126.853229),
+                new FinalLocationUpdateDto(updateFinalLocation, updateFinalLatitude, 125.853300));
+
+        lostPostService.updateLostPost(1L, dto, member);
+
+        assertEquals(updateFeatures, lostPost.getFeatures());
+        assertEquals(updateFinalLocation, lostPost.getFinalLocation());
+        assertEquals(updateFinalLatitude, lostPost.getFinalPoint().getY());
+        assertEquals("경기도", lostPost.getLostLocation());
+    }
+
+    private void setLostPost() {
+        LostPostReqDto dto = new LostPostReqDto("강아지", "흰색이고 말티즈, 미용 안함", Gender.F, true, false,
+                "경기도", 37.468873, 126.853229,
+                "경기도 서울", 38.468873, 126.853229, LocalDateTime.now());
+        lostPost = LostPost.builder()
+                .dto(dto)
+                .writer(member)
+                .lostPoint(PointParser.parsePoint(dto.getLostLatitude(), dto.getLostLongitude()))
+                .finalPoint(PointParser.parsePoint(dto.getFinalLatitude(), dto.getFinalLongitude()))
+                .build();
+    }
 }

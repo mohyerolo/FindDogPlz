@@ -12,6 +12,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.*;
@@ -30,6 +31,7 @@ class AuthServiceTest {
 
     @Test
     @DisplayName("회원가입- 아이디 중복 에러")
+    @Transactional
     void signUp_duplicatedId() {
         SignUpDto dto = new SignUpDto("garamId", "password", "garam", "010-1111-1111");
 
