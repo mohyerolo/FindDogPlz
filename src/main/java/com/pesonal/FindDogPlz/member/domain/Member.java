@@ -35,24 +35,15 @@ public class Member extends BaseDateEntity {
     @NotNull
     private String phone;
 
-    @NotNull
-    private String address;
-
-    @NotNull
-    @Column(columnDefinition = "point")
-    private Point point;
-
     @ElementCollection
     private List<String> roles = new ArrayList<>();
 
     @Builder
-    public Member(SignUpDto signUpDto, Point point, PasswordEncoder pwEncoder) {
+    public Member(SignUpDto signUpDto, PasswordEncoder pwEncoder) {
         this.loginId = signUpDto.getLoginId();
         this.password = pwEncoder.encode(signUpDto.getPassword());
         this.name = signUpDto.getName();
         this.phone = signUpDto.getPhone();
-        this.address = signUpDto.getAddress();
-        this.point = point;
         this.roles = Collections.singletonList("ROLE_USER");
     }
 }

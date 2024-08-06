@@ -32,7 +32,6 @@ public class AuthService {
         validateDuplicateId(dto.getLoginId());
         Member member = Member.builder()
                 .signUpDto(dto)
-                .point(PointParser.parsePoint(dto.getLatitude(), dto.getLongitude()))
                 .pwEncoder(encoder)
                 .build();
         memberRepository.save(member);

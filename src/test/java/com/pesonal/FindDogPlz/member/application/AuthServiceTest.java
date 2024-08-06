@@ -31,7 +31,7 @@ class AuthServiceTest {
     @Test
     @DisplayName("회원가입- 아이디 중복 에러")
     void signUp_duplicatedId() {
-        SignUpDto dto = new SignUpDto("garamId", "password", "garam", "010-1111-1111", "주소", 37.468873, 126.853229);
+        SignUpDto dto = new SignUpDto("garamId", "password", "garam", "010-1111-1111");
 
         when(memberRepository.existsByLoginId("garamId")).thenReturn(true);
         assertThatThrownBy(() -> authService.signUp(dto))
@@ -41,7 +41,7 @@ class AuthServiceTest {
     @Test
     @DisplayName("회원가입 성공")
     void signUp_phone_regexError() {
-        SignUpDto dto = new SignUpDto("garamId", "password", "garam", "010-1111-1111", "주소", 37.468873, 126.853229);
+        SignUpDto dto = new SignUpDto("garamId", "password", "garam", "010-1111-1111");
 
         when(memberRepository.existsByLoginId("garamId")).thenReturn(false);
 

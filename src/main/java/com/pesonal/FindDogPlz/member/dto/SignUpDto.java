@@ -26,14 +26,4 @@ public class SignUpDto {
     @NotBlank
     @Pattern(regexp = "^010-\\d{3,4}-\\d{4}$", message = "휴대폰 번호 양식에 맞지 않습니다.")
     private String phone;
-
-    @NotBlank
-    private String address;
-
-    @NotNull
-    private Double latitude;
-
-    @NotNull
-    private Double longitude;
-
 }
