@@ -4,6 +4,7 @@ import com.pesonal.FindDogPlz.global.common.BaseDateEntity;
 import com.pesonal.FindDogPlz.global.common.Gender;
 import com.pesonal.FindDogPlz.member.domain.Member;
 import com.pesonal.FindDogPlz.post.dto.LostPostReqDto;
+import com.pesonal.FindDogPlz.post.dto.LostPostUpdateDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -71,5 +72,24 @@ public class LostPost extends BaseDateEntity {
         this.finalLocation = dto.getFinalLocation();
         this.finalPoint = finalPoint;
         this.lostDate = dto.getLostDate();
+    }
+
+    public void updatePostContent(LostPostUpdateDto dto) {
+        this.animalName = dto.getAnimalName();
+        this.features = dto.getFeatures();
+        this.gender = dto.getGender();
+        this.lead = dto.isLead();
+        this.chip = dto.isChip();
+        this.lostDate = dto.getLostDate();
+    }
+
+    public void updateLostLocation(String lostLocation, Point lostPoint) {
+        this.lostLocation = lostLocation;
+        this.lostPoint = lostPoint;
+    }
+
+    public void updateFinalLocation(String finalLocation, Point finalPoint) {
+        this.finalLocation = finalLocation;
+        this.finalPoint = finalPoint;
     }
 }
