@@ -5,10 +5,12 @@ import com.pesonal.FindDogPlz.global.exception.CustomException;
 import com.pesonal.FindDogPlz.global.exception.ErrorCode;
 import com.pesonal.FindDogPlz.member.domain.Member;
 import com.pesonal.FindDogPlz.post.application.LostPostService;
+import com.pesonal.FindDogPlz.post.dto.LostPostOutlineDto;
 import com.pesonal.FindDogPlz.post.dto.LostPostReqDto;
 import com.pesonal.FindDogPlz.post.dto.LostPostUpdateDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,5 +36,11 @@ public class LostPostController {
             throw new CustomException(ErrorCode.AUTHENTICATION_ERROR);
         }
         return ResponseEntity.ok(lostPostService.updateLostPost(id, dto, member));
+    }
+
+    @GetMapping("/all")
+    public ResponseEntity<Slice<LostPostOutlineDto>> searchAllByNoOffset(@RequestParam(required = false) Long lastLostPostId,
+                                                                         @RequestParam(required = false, defaultValue = "9") int size) {
+        return ResponseEntity.ok(lostPostService.getAllLostPost(lastLostPostId, size));
     }
 }

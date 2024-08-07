@@ -5,13 +5,13 @@ import com.pesonal.FindDogPlz.global.exception.ErrorCode;
 import com.pesonal.FindDogPlz.global.util.PointParser;
 import com.pesonal.FindDogPlz.member.domain.Member;
 import com.pesonal.FindDogPlz.post.domain.LostPost;
-import com.pesonal.FindDogPlz.post.dto.FinalLocationUpdateDto;
-import com.pesonal.FindDogPlz.post.dto.LostLocationUpdateDto;
-import com.pesonal.FindDogPlz.post.dto.LostPostReqDto;
-import com.pesonal.FindDogPlz.post.dto.LostPostUpdateDto;
+import com.pesonal.FindDogPlz.post.dto.*;
+import com.pesonal.FindDogPlz.post.repository.LostPostQueryRepository;
 import com.pesonal.FindDogPlz.post.repository.LostPostRepository;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class LostPostService {
     private final LostPostRepository lostPostRepository;
+    private final LostPostQueryRepository lostPostQueryRepository;
 
     @Transactional
     public void createLostPost(LostPostReqDto dto, Member member) {
@@ -61,6 +62,11 @@ public class LostPostService {
             Point finalPoint = parsePoint(dto.getLatitude(), dto.getLongitude());
             lostPost.updateFinalLocation(dto.getFinalLocation(), finalPoint);
         }
+    }
+
+    public Slice<LostPostOutlineDto> getAllLostPost(Long lastLostPostId, int size) {
+        PageRequest pageRequest = PageRequest.ofSize(size);
+        return lostPostQueryRepository.searchByLastPostId(lastLostPostId, pageRequest);
     }
 
     private Point parsePoint(Double latitude, Double longitude) {
