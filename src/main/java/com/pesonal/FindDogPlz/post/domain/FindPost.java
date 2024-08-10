@@ -3,9 +3,11 @@ package com.pesonal.FindDogPlz.post.domain;
 import com.pesonal.FindDogPlz.global.common.BaseDateEntity;
 import com.pesonal.FindDogPlz.global.common.Gender;
 import com.pesonal.FindDogPlz.member.domain.Member;
+import com.pesonal.FindDogPlz.post.dto.FindPostReqDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
@@ -44,4 +46,29 @@ public class FindPost extends BaseDateEntity {
 
     @NotNull
     private LocalDateTime findDate;
+
+    @Builder
+    public FindPost(FindPostReqDto dto, Member writer, Point point) {
+        this.writer = writer;
+        this.features = dto.getFeatures();
+        this.gender = dto.getGender();
+        this.lead = dto.isLead();
+        this.chip = dto.isChip();
+        this.location = dto.getLocation();
+        this.locPoint = point;
+        this.findDate = dto.getFindDate();
+    }
+
+    public void updatePost(FindPostReqDto dto) {
+        this.features = dto.getFeatures();
+        this.gender = dto.getGender();
+        this.lead = dto.isLead();
+        this.chip = dto.isChip();
+        this.findDate = dto.getFindDate();
+    }
+
+    public void updateFindLocation(String location, Point findPoint) {
+        this.location = location;
+        this.locPoint = findPoint;
+    }
 }
