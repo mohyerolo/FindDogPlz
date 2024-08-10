@@ -16,6 +16,8 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Optional;
+
 @Service
 @RequiredArgsConstructor
 public class LostPostService {
@@ -67,6 +69,15 @@ public class LostPostService {
     public Slice<LostPostOutlineDto> getAllLostPost(Long lastLostPostId, int size) {
         PageRequest pageRequest = PageRequest.ofSize(size);
         return lostPostQueryRepository.searchByLastPostId(lastLostPostId, pageRequest);
+    }
+
+    public LostPostDetailDto getLostPostById(Long id) {
+        return lostPostRepository.findById(id)
+                .map(lostPost -> LostPostDetailDto.builder()
+                        .lostPost(lostPost)
+                        .writer(lostPost.getWriter())
+                        .build())
+                .orElse(null);
     }
 
     private Point parsePoint(Double latitude, Double longitude) {

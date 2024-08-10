@@ -4,10 +4,7 @@ import com.pesonal.FindDogPlz.global.common.Gender;
 import com.pesonal.FindDogPlz.global.util.PointParser;
 import com.pesonal.FindDogPlz.member.domain.Member;
 import com.pesonal.FindDogPlz.post.domain.LostPost;
-import com.pesonal.FindDogPlz.post.dto.FinalLocationUpdateDto;
-import com.pesonal.FindDogPlz.post.dto.LostLocationUpdateDto;
-import com.pesonal.FindDogPlz.post.dto.LostPostReqDto;
-import com.pesonal.FindDogPlz.post.dto.LostPostUpdateDto;
+import com.pesonal.FindDogPlz.post.dto.*;
 import com.pesonal.FindDogPlz.post.repository.LostPostRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,8 +18,7 @@ import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabas
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -91,6 +87,27 @@ class LostPostServiceTest {
         assertEquals(updateFinalLocation, lostPost.getFinalLocation());
         assertEquals(updateFinalLatitude, lostPost.getFinalPoint().getY());
         assertEquals("경기도", lostPost.getLostLocation());
+    }
+
+    @Test
+    void getLostPostById() {
+        setLostPost();
+        when(lostPostRepository.findById(anyLong())).thenReturn(Optional.ofNullable(lostPost));
+        when(member.getId()).thenReturn(1L);
+        when(member.getName()).thenReturn("이름");
+
+        LostPostDetailDto lostPostDetailDto = lostPostService.getLostPostById(1L);
+        assertEquals("강아지", lostPostDetailDto.getAnimalName());
+        assertEquals("이름", lostPostDetailDto.getWriterName());
+    }
+
+    @Test
+    void getLostPostById_찾을수없음() {
+        setLostPost();
+        when(lostPostRepository.findById(anyLong())).thenReturn(Optional.empty());
+
+        LostPostDetailDto lostPostDetailDto = lostPostService.getLostPostById(1L);
+        assertNull(lostPostDetailDto);
     }
 
     private void setLostPost() {

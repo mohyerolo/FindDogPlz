@@ -5,6 +5,7 @@ import com.pesonal.FindDogPlz.global.exception.CustomException;
 import com.pesonal.FindDogPlz.global.exception.ErrorCode;
 import com.pesonal.FindDogPlz.member.domain.Member;
 import com.pesonal.FindDogPlz.post.application.LostPostService;
+import com.pesonal.FindDogPlz.post.dto.LostPostDetailDto;
 import com.pesonal.FindDogPlz.post.dto.LostPostOutlineDto;
 import com.pesonal.FindDogPlz.post.dto.LostPostReqDto;
 import com.pesonal.FindDogPlz.post.dto.LostPostUpdateDto;
@@ -42,5 +43,10 @@ public class LostPostController {
     public ResponseEntity<Slice<LostPostOutlineDto>> searchAllByNoOffset(@RequestParam(required = false) Long lastLostPostId,
                                                                          @RequestParam(required = false, defaultValue = "9") int size) {
         return ResponseEntity.ok(lostPostService.getAllLostPost(lastLostPostId, size));
+    }
+
+    @GetMapping
+    public ResponseEntity<LostPostDetailDto> getLostPostById(@RequestParam Long id) {
+        return ResponseEntity.ok(lostPostService.getLostPostById(id));
     }
 }
