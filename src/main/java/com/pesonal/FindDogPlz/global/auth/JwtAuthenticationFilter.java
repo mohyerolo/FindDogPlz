@@ -20,10 +20,14 @@ import java.util.Arrays;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
-    private static final String[] SHOULD_NOT_FILTER_URI = new String[]{"/auth/sign-in", "/auth/sign-up", "/posts/**"};
+    private static final String[] SHOULD_NOT_FILTER_URI = new String[]{"/auth/sign-in", "/auth/sign-up"};
+    private static final String[] SHOULD_NOT_FILTER_GET_URI = new String[] {"/posts/**"};
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        if (request.getMethod().equals("GET")) {
+            return Arrays.stream(SHOULD_NOT_FILTER_GET_URI).anyMatch(e -> new AntPathMatcher().match(e, request.getServletPath()));
+        }
         return Arrays.stream(SHOULD_NOT_FILTER_URI)
                 .anyMatch(e -> new AntPathMatcher().match(e, request.getServletPath()));
     }
