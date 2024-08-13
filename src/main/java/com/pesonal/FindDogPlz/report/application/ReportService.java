@@ -7,10 +7,14 @@ import com.pesonal.FindDogPlz.member.domain.Member;
 import com.pesonal.FindDogPlz.post.domain.LostPost;
 import com.pesonal.FindDogPlz.post.repository.LostPostRepository;
 import com.pesonal.FindDogPlz.report.domain.Report;
+import com.pesonal.FindDogPlz.report.dto.ReportDto;
 import com.pesonal.FindDogPlz.report.dto.ReportReqDto;
+import com.pesonal.FindDogPlz.report.repository.ReportQueryRepository;
 import com.pesonal.FindDogPlz.report.repository.ReportRepository;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,6 +23,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class ReportService {
     private final ReportRepository reportRepository;
+    private final ReportQueryRepository reportQueryRepository;
+
     private final LostPostRepository lostPostRepository;
 
     @Transactional
@@ -48,6 +54,11 @@ public class ReportService {
             Point findPoint = parsePoint(dto.getFindLatitude(), dto.getFindLongitude());
             report.updateLocation(dto.getFindLocation(), findPoint);
         }
+    }
+
+    public Slice<ReportDto> getAllReportForLostPost(Long postId, Long lastReportId, int size) {
+        PageRequest pageRequest = PageRequest.ofSize(size);
+        return reportQueryRepository.searchAllReportByLostPostIdAndLastReportId(postId, lastReportId, pageRequest).map(ReportDto::new);
     }
 
     private Point parsePoint(Double latitude, Double longitude) {

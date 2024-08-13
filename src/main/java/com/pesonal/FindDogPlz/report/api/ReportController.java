@@ -5,9 +5,11 @@ import com.pesonal.FindDogPlz.global.exception.CustomException;
 import com.pesonal.FindDogPlz.global.exception.ErrorCode;
 import com.pesonal.FindDogPlz.member.domain.Member;
 import com.pesonal.FindDogPlz.report.application.ReportService;
+import com.pesonal.FindDogPlz.report.dto.ReportDto;
 import com.pesonal.FindDogPlz.report.dto.ReportReqDto;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -29,5 +31,11 @@ public class ReportController {
         if (member == null) throw new CustomException(ErrorCode.AUTHENTICATION_ERROR);
         reportService.updateReport(postId, dto, member);
         return ResponseEntity.ok().body("완료");
+    }
+
+    @GetMapping
+    public ResponseEntity<Slice<ReportDto>> getAllReportForLostPost(@RequestParam Long postId, @RequestParam(required = false) Long lastReportId,
+                                                                    @RequestParam(required = false, defaultValue = "9") int size) {
+        return ResponseEntity.ok(reportService.getAllReportForLostPost(postId, lastReportId, size));
     }
 }
