@@ -38,4 +38,18 @@ public class ReportController {
                                                                     @RequestParam(required = false, defaultValue = "9") int size) {
         return ResponseEntity.ok(reportService.getAllReportForLostPost(postId, lastReportId, size));
     }
+
+    @DeleteMapping
+    public ResponseEntity<String> deleteReport(@RequestParam Long reportId, @AuthMember Member reportWriter) {
+        if (reportWriter == null) throw new CustomException(ErrorCode.AUTHENTICATION_ERROR);
+        reportService.deleteReport(reportId, reportWriter);
+        return ResponseEntity.ok().body("완료");
+    }
+
+    @DeleteMapping("/exclude")
+    public ResponseEntity<String> excludeReportByLostPostWriter(@RequestParam Long reportId, @AuthMember Member lostPostWriter) {
+        if (lostPostWriter == null) throw new CustomException(ErrorCode.AUTHENTICATION_ERROR);
+        reportService.excludeReportByLostPostWriter(reportId, lostPostWriter);
+        return ResponseEntity.ok().body("완료");
+    }
 }

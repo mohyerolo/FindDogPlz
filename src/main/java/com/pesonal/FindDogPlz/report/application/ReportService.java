@@ -42,7 +42,7 @@ public class ReportService {
 
     @Transactional
     public void updateReport(Long id, ReportReqDto dto, Member member) {
-        Report report = reportRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "수정할 공고를 찾지 못했습니다."));
+        Report report = findReport(id);
         validateWriter(report.getWriter(), member);
 
         report.updateReport(dto);
@@ -59,6 +59,27 @@ public class ReportService {
     public Slice<ReportDto> getAllReportForLostPost(Long postId, Long lastReportId, int size) {
         PageRequest pageRequest = PageRequest.ofSize(size);
         return reportQueryRepository.searchAllReportByLostPostIdAndLastReportId(postId, lastReportId, pageRequest).map(ReportDto::new);
+    }
+
+    @Transactional
+    public void deleteReport(Long reportId, Member reportWriter) {
+        Report report = findReport(reportId);
+        validateWriter(report.getWriter(), reportWriter);
+
+        reportRepository.delete(report);
+    }
+
+    @Transactional
+    public void excludeReportByLostPostWriter(Long reportId, Member lostPostWriter) {
+        Report report = findReport(reportId);
+        validateWriter(report.getLostPost().getWriter(), lostPostWriter);
+
+        reportRepository.delete(report);
+    }
+
+    private Report findReport(Long reportId) {
+        return reportRepository.findById(reportId)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
     }
 
     private Point parsePoint(Double latitude, Double longitude) {
