@@ -36,6 +36,9 @@ public class Report extends BaseDateEntity {
     @Column(columnDefinition = "point")
     private Point point;
 
+    @NotNull
+    private boolean includedInTimeline;
+
     @Builder
     public Report(ReportReqDto dto, Member member, LostPost lostPost, Point point) {
         this.writer = member;
@@ -43,6 +46,7 @@ public class Report extends BaseDateEntity {
         this.features = dto.getFeatures();
         this.findLocation = dto.getFindLocation();
         this.point = point;
+        this.includedInTimeline = false;
     }
 
     public void updateReport(ReportReqDto dto) {
@@ -52,5 +56,9 @@ public class Report extends BaseDateEntity {
     public void updateLocation(String location, Point point) {
         this.findLocation = location;
         this.point = point;
+    }
+
+    public void includedInTimeLine() {
+        this.includedInTimeline = true;
     }
 }

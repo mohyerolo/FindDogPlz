@@ -27,12 +27,9 @@ public class TimeLineService {
         Report report = findReport(reportId);
         validateMemberIsLostPostWriter(report.getLostPost(), lostPostWriter);
 
-        TimeLine timeLine = createTimeLineFromReport(report);
-        timeLineRepository.save(timeLine);
+        timeLineRepository.save(createTimeLineFromReport(report));
 
-        if (finalLoc) {
-            updateLostPostLocation(report);
-        }
+        updateRelatedDetails(report, finalLoc);
     }
 
     private TimeLine createTimeLineFromReport(Report report) {
@@ -41,6 +38,13 @@ public class TimeLineService {
                 .report(report)
                 .reportedDate(report.getCreatedDate())
                 .build();
+    }
+
+    private void updateRelatedDetails(Report report, boolean finalLoc) {
+        if (finalLoc) {
+            updateLostPostLocation(report);
+        }
+        report.includedInTimeLine();
     }
 
     private void updateLostPostLocation(Report report) {
