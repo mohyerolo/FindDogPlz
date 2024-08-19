@@ -23,7 +23,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private static final String[] PERMIT_ALL = new String[] {"/", "/auth/**"};
-    private static final String[] PERMIT_GET = new String[] {"/posts/**", "/reports/**"};
+    private static final String[] PERMIT_GET = new String[] {"/posts/**", "/reports/**", "/timeline/**"};
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {

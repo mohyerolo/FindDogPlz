@@ -21,7 +21,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtTokenProvider jwtTokenProvider;
     private static final String[] SHOULD_NOT_FILTER_URI = new String[]{"/auth/sign-in", "/auth/sign-up"};
-    private static final String[] SHOULD_NOT_FILTER_GET_URI = new String[] {"/posts/**", "/reports/**"};
+    private static final String[] SHOULD_NOT_FILTER_GET_URI = new String[] {"/posts/**", "/reports/**", "/timeline/**"};
 
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
