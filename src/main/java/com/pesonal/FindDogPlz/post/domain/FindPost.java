@@ -47,6 +47,9 @@ public class FindPost extends BaseDateEntity {
     @NotNull
     private LocalDateTime findDate;
 
+    @NotNull
+    private boolean completed;
+
     @Builder
     public FindPost(FindPostReqDto dto, Member writer, Point point) {
         this.writer = writer;
@@ -57,6 +60,7 @@ public class FindPost extends BaseDateEntity {
         this.location = dto.getLocation();
         this.locPoint = point;
         this.findDate = dto.getFindDate();
+        this.completed = false;
     }
 
     public void updatePost(FindPostReqDto dto) {
@@ -70,5 +74,9 @@ public class FindPost extends BaseDateEntity {
     public void updateFindLocation(String location, Point findPoint) {
         this.location = location;
         this.locPoint = findPoint;
+    }
+
+    public void closePost() {
+        this.completed = true;
     }
 }

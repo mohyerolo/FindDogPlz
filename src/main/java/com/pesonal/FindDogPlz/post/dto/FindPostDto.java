@@ -39,6 +39,8 @@ public class FindPostDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDate;
 
+    private boolean completed;
+
     @Builder
     public FindPostDto(FindPost findPost) {
         this.id = findPost.getId();
@@ -50,5 +52,6 @@ public class FindPostDto {
         this.findLocation = findPost.getLocation();
         this.findDate = findPost.getFindDate();
         this.createdDate = findPost.getCreatedDate();
+        this.completed = findPost.isCompleted();
     }
 }

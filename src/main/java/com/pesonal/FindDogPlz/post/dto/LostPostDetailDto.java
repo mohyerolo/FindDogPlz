@@ -27,6 +27,8 @@ public class LostPostDetailDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime lostDate;
 
+    private boolean completed;
+
     @Builder
     public LostPostDetailDto (LostPost lostPost, Member writer) {
         this.id = lostPost.getId();
@@ -40,5 +42,6 @@ public class LostPostDetailDto {
         this.lostLocation = lostPost.getLostLocation();
         this.finalLocation = lostPost.getFinalLocation();
         this.lostDate = lostPost.getLostDate();
+        this.completed = lostPost.isCompleted();
     }
 }

@@ -59,6 +59,9 @@ public class LostPost extends BaseDateEntity {
     @NotNull
     private LocalDateTime lostDate;
 
+    @NotNull
+    private boolean completed;
+
     @Builder
     public LostPost(LostPostReqDto dto, Member writer, Point lostPoint, Point finalPoint) {
         this.writer = writer;
@@ -72,6 +75,7 @@ public class LostPost extends BaseDateEntity {
         this.finalLocation = dto.getFinalLocation();
         this.finalPoint = finalPoint;
         this.lostDate = dto.getLostDate();
+        this.completed = false;
     }
 
     public void updatePostContent(LostPostUpdateDto dto) {
@@ -91,5 +95,9 @@ public class LostPost extends BaseDateEntity {
     public void updateFinalLocation(String finalLocation, Point finalPoint) {
         this.finalLocation = finalLocation;
         this.finalPoint = finalPoint;
+    }
+
+    public void closePost() {
+        this.completed = true;
     }
 }

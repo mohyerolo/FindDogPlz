@@ -22,7 +22,7 @@ public class LostPostQueryRepositoryImpl implements LostPostQueryRepository{
 
     public Slice<LostPostOutlineDto> searchByLastPostId(Long lastLostPostId, Pageable pageable) {
         List<LostPostOutlineDto> results = jpaQueryFactory
-                .select(new QLostPostOutlineDto(lostPost.id, lostPost.animalName, lostPost.lostLocation, lostPost.lostDate, lostPost.createdDate))
+                .select(new QLostPostOutlineDto(lostPost.id, lostPost.animalName, lostPost.lostLocation, lostPost.lostDate, lostPost.createdDate, lostPost.completed))
                 .from(lostPost)
                 .where(ltLostPostId(lastLostPostId))
                 .orderBy(lostPost.id.desc())

@@ -15,13 +15,15 @@ public class LostPostOutlineDto {
     private String lostLocation;
     private LocalDateTime lostDate;
     private LocalDateTime createdDate;
+    private boolean completed;
 
     @QueryProjection
-    public LostPostOutlineDto(Long id, String animalName, String lostLocation, LocalDateTime lostDate, LocalDateTime createdDate) {
+    public LostPostOutlineDto(Long id, String animalName, String lostLocation, LocalDateTime lostDate, LocalDateTime createdDate, boolean completed) {
         this.id = id;
         this.animalName = animalName;
         this.lostLocation = lostLocation;
         this.lostDate = lostDate;
         this.createdDate = createdDate;
+        this.completed = completed;
     }
 }
