@@ -22,7 +22,7 @@ public class SimpleMarkableFactory implements MarkableFactory {
     @Override
     public Markable getMapData(MapType mapType) {
         if (mapType.equals(MapType.FIND)) {
-            return new FindMarkableData();
+            return new FindMarkableData(entityManager, findPostRepository);
         } else if (mapType.equals(MapType.LOST)) {
             return new LostMarkableData(entityManager, lostPostRepository);
         } else {

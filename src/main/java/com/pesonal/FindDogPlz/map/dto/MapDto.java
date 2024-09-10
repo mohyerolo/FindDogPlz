@@ -1,6 +1,7 @@
 package com.pesonal.FindDogPlz.map.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.pesonal.FindDogPlz.post.domain.FindPost;
 import com.pesonal.FindDogPlz.post.domain.LostPost;
 import lombok.*;
 
@@ -30,6 +31,17 @@ public class MapDto {
         this.latitude = lostPost.getLostPoint().getY();
         this.createdDate = lostPost.getCreatedDate();
         this.postType = PostType.LOST;
+        this.dist = dist;
+    }
+
+    @Builder(builderMethodName = "findPostBuilder", buildMethodName = "findPostBuild")
+    public MapDto(FindPost findPost, Double dist) {
+        this.id = findPost.getId();
+        this.location = findPost.getLocation();
+        this.longitude = findPost.getLocPoint().getX();
+        this.latitude = findPost.getLocPoint().getY();
+        this.createdDate = findPost.getCreatedDate();
+        this.postType = PostType.FIND;
         this.dist = dist;
     }
 }
