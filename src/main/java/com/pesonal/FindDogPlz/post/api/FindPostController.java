@@ -39,4 +39,10 @@ public class FindPostController {
                                                                           @RequestParam(required = false, defaultValue = "9") int size) {
         return ResponseEntity.ok(findPostService.getAllFindPost(lastFindPostId, size));
     }
+
+    @PutMapping("/end")
+    public ResponseEntity<String> closeFindPost(@RequestParam Long id, @AuthMember Member member) {
+        findPostService.closeFindPost(id, member);
+        return ResponseEntity.ok().body("완료");
+    }
 }

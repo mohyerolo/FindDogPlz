@@ -49,4 +49,10 @@ public class LostPostController {
     public ResponseEntity<LostPostDetailDto> getLostPostById(@RequestParam Long id) {
         return ResponseEntity.ok(lostPostService.getLostPostById(id));
     }
+
+    @PutMapping("/end")
+    public ResponseEntity<String> closeLostPost(@RequestParam Long id, @AuthMember Member member) {
+        lostPostService.closeLostPost(id, member);
+        return ResponseEntity.ok().body("완료");
+    }
 }

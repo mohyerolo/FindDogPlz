@@ -56,6 +56,13 @@ public class FindPostService {
         return findPostQueryRepository.searchAllByLastFindPostId(lastFindPostId, pageRequest).map(FindPostDto::new);
     }
 
+    @Transactional
+    public void closeFindPost(Long id, Member member) {
+        FindPost findPost = findPostRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "수정할 공고를 찾지 못했습니다."));
+        validateWriter(findPost.getWriter(), member);
+        findPost.closePost();
+    }
+
     private Point parsePoint(Double latitude, Double longitude) {
         return PointParser.parsePoint(latitude, longitude);
     }

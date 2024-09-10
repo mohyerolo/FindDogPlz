@@ -16,8 +16,6 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
 public class LostPostService {
@@ -78,6 +76,13 @@ public class LostPostService {
                         .writer(lostPost.getWriter())
                         .build())
                 .orElse(null);
+    }
+
+    @Transactional
+    public void closeLostPost(Long id, Member member) {
+        LostPost lostPost = lostPostRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "수정하려는 공고를 찾을 수 없습니다."));
+        validateWriter(lostPost.getWriter(), member);
+        lostPost.closePost();
     }
 
     private Point parsePoint(Double latitude, Double longitude) {
