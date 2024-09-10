@@ -36,8 +36,9 @@ public class FindPostController {
 
     @GetMapping("/all")
     public ResponseEntity<Slice<FindPostDto>> searchAllFindPostByNoOffset(@RequestParam(required = false) Long lastFindPostId,
+                                                                          @RequestParam(required = false, defaultValue = "false") boolean close,
                                                                           @RequestParam(required = false, defaultValue = "9") int size) {
-        return ResponseEntity.ok(findPostService.getAllFindPost(lastFindPostId, size));
+        return ResponseEntity.ok(findPostService.getAllFindPost(lastFindPostId, close, size));
     }
 
     @PutMapping("/end")

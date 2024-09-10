@@ -5,5 +5,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 public interface FindPostQueryRepository {
-    Slice<FindPost> searchAllByLastFindPostId(Long lastFindPostId, Pageable pageable);
+    Slice<FindPost> searchAllByLastFindPostId(Long lastFindPostId, boolean close, Pageable pageable);
 }

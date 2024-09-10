@@ -64,9 +64,9 @@ public class LostPostService {
         }
     }
 
-    public Slice<LostPostOutlineDto> getAllLostPost(Long lastLostPostId, int size) {
+    public Slice<LostPostOutlineDto> getAllLostPost(Long lastLostPostId, boolean close, int size) {
         PageRequest pageRequest = PageRequest.ofSize(size);
-        return lostPostQueryRepository.searchByLastPostId(lastLostPostId, pageRequest);
+        return lostPostQueryRepository.searchByLastPostId(lastLostPostId, close, pageRequest);
     }
 
     public LostPostDetailDto getLostPostById(Long id) {

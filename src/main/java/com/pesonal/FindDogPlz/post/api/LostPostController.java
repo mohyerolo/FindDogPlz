@@ -41,8 +41,9 @@ public class LostPostController {
 
     @GetMapping("/all")
     public ResponseEntity<Slice<LostPostOutlineDto>> searchAllByNoOffset(@RequestParam(required = false) Long lastLostPostId,
+                                                                         @RequestParam(required = false, defaultValue = "false") boolean close,
                                                                          @RequestParam(required = false, defaultValue = "9") int size) {
-        return ResponseEntity.ok(lostPostService.getAllLostPost(lastLostPostId, size));
+        return ResponseEntity.ok(lostPostService.getAllLostPost(lastLostPostId, close, size));
     }
 
     @GetMapping

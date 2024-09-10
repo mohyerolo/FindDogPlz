@@ -51,9 +51,9 @@ public class FindPostService {
         }
     }
 
-    public Slice<FindPostDto> getAllFindPost(Long lastFindPostId, int size) {
+    public Slice<FindPostDto> getAllFindPost(Long lastFindPostId, boolean close, int size) {
         PageRequest pageRequest = PageRequest.ofSize(size);
-        return findPostQueryRepository.searchAllByLastFindPostId(lastFindPostId, pageRequest).map(FindPostDto::new);
+        return findPostQueryRepository.searchAllByLastFindPostId(lastFindPostId, close, pageRequest).map(FindPostDto::new);
     }
 
     @Transactional

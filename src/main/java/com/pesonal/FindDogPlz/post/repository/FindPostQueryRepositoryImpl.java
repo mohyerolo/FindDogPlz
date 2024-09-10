@@ -20,11 +20,14 @@ public class FindPostQueryRepositoryImpl implements FindPostQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Slice<FindPost> searchAllByLastFindPostId(Long lastFindPostId, Pageable pageable) {
+    public Slice<FindPost> searchAllByLastFindPostId(Long lastFindPostId, boolean close, Pageable pageable) {
         List<FindPost> results = jpaQueryFactory
                 .selectFrom(findPost)
                 .innerJoin(findPost.writer)
-                .where(ltFindPostId(lastFindPostId))
+                .where(
+                        ltFindPostId(lastFindPostId),
+                        findPost.completed.eq(close)
+                )
                 .orderBy(findPost.id.desc())
                 .limit(pageable.getPageSize() + 1)
                 .fetchJoin()
