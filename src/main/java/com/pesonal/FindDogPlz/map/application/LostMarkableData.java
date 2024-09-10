@@ -36,7 +36,7 @@ public class LostMarkableData implements Markable {
     private String buildQueryString(String pointFormat) {
         return String.format(
                 "SELECT * FROM lost_post AS lp " +
-                "WHERE MBRContains(ST_LINESTRINGFROMTEXT(%s), lp.lost_point) " +
+                "WHERE lp.completed = 0 and MBRContains(ST_LINESTRINGFROMTEXT(%s), lp.lost_point) " +
                 "ORDER BY lp.id",
                 pointFormat
         );
@@ -58,9 +58,6 @@ public class LostMarkableData implements Markable {
 
     private Double calcDist(Double longitude, Double latitude, Long lostPostId) {
         Point point = PointParser.parsePoint(latitude, longitude);
-        if (point != null) {
-            return lostPostRepository.findDistByPoint(point.getX(), point.getY(), lostPostId);
-        }
-        return null;
+        return point != null ? lostPostRepository.findDistByPoint(point.getX(), point.getY(), lostPostId) : null;
     }
 }
