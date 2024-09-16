@@ -1,32 +1,29 @@
 package com.pesonal.FindDogPlz.map.application;
 
 import com.pesonal.FindDogPlz.map.dto.MapType;
-import com.pesonal.FindDogPlz.post.repository.FindPostRepository;
-import com.pesonal.FindDogPlz.post.repository.LostPostRepository;
-import jakarta.persistence.EntityManager;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 @Component
 public class SimpleMarkableFactory implements MarkableFactory {
 
-    private final LostPostRepository lostPostRepository;
-    private final FindPostRepository findPostRepository;
-    private final EntityManager entityManager;
+    private final FindMarkableData findMarkableFactory;
+    private final LostMarkableData lostMarkableFactory;
+    private final AllMarkableData allMarkableFactory;
 
-    public SimpleMarkableFactory(LostPostRepository lostPostRepository, FindPostRepository findPostRepository, EntityManager entityManager) {
-        this.lostPostRepository = lostPostRepository;
-        this.findPostRepository = findPostRepository;
-        this.entityManager = entityManager;
+    @Autowired
+    public SimpleMarkableFactory(FindMarkableData findMarkableFactory, LostMarkableData lostMarkableFactory, AllMarkableData allMarkableFactory) {
+        this.findMarkableFactory = findMarkableFactory;
+        this.lostMarkableFactory = lostMarkableFactory;
+        this.allMarkableFactory = allMarkableFactory;
     }
 
     @Override
-    public Markable getMapData(MapType mapType) {
-        if (mapType.equals(MapType.FIND)) {
-            return new FindMarkableData(entityManager, findPostRepository);
-        } else if (mapType.equals(MapType.LOST)) {
-            return new LostMarkableData(entityManager, lostPostRepository);
-        } else {
-            return new AllMarkableData();
-        }
+    public Markable getMarkableFactory(MapType mapType) {
+        return switch (mapType) {
+            case FIND -> findMarkableFactory;
+            case LOST -> lostMarkableFactory;
+            case ALL -> allMarkableFactory;
+        };
     }
 }

@@ -13,7 +13,7 @@ public class MapService {
     private final MarkableFactory markableFactory;
 
     public List<MapDto> getMapData(MapType mapType, Double longitude, Double latitude) {
-        Markable mapData = markableFactory.getMapData(mapType);
-        return mapData.getMarkableData(longitude, latitude);
+        Markable factory = markableFactory.getMarkableFactory(mapType);
+        return factory.getMarkableData(longitude, latitude);
     }
 }
