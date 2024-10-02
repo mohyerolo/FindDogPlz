@@ -2,17 +2,14 @@ package com.pesonal.FindDogPlz.chat.domain;
 
 import com.pesonal.FindDogPlz.global.common.BaseDateEntity;
 import com.pesonal.FindDogPlz.member.domain.Member;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
+@Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor
 public class LostChat extends BaseDateEntity {
 
     @Id
@@ -29,6 +26,5 @@ public class LostChat extends BaseDateEntity {
     private String message;
 
     @NotNull
-    private boolean read;
-
+    private boolean checked;
 }
