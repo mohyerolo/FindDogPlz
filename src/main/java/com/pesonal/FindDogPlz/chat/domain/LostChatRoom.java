@@ -5,6 +5,7 @@ import com.pesonal.FindDogPlz.member.domain.Member;
 import com.pesonal.FindDogPlz.post.domain.LostPost;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,5 +21,11 @@ public class LostChatRoom extends BaseDateEntity {
     private LostPost lostPost;
 
     @ManyToOne
-    private Member receiver;
+    private Member reporter;
+
+    @Builder
+    public LostChatRoom(LostPost lostPost, Member reporter) {
+        this.lostPost = lostPost;
+        this.reporter = reporter;
+    }
 }

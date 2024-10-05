@@ -8,7 +8,6 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.locationtech.jts.geom.Point;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.ArrayList;
@@ -24,6 +23,7 @@ public class Member extends BaseDateEntity {
     private Long id;
 
     @NotNull
+    @Column(unique = true)
     private String loginId;
 
     @NotNull
