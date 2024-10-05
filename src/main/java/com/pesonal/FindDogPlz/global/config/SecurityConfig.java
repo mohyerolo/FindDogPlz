@@ -22,7 +22,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @RequiredArgsConstructor
 public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
-    private static final String[] PERMIT_ALL = new String[] {"/", "/auth/**"};
+    private static final String[] PERMIT_ALL = new String[] {"/", "/auth/**", "/ws/**"};
     private static final String[] PERMIT_GET = new String[] {"/posts/**", "/reports/**", "/timeline/**", "/map"};
 
     @Bean
