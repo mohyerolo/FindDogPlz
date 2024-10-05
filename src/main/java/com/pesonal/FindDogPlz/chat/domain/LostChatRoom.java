@@ -20,5 +20,5 @@ public class LostChatRoom extends BaseDateEntity {
     private LostPost lostPost;
 
     @ManyToOne
-    private Member reporter;
+    private Member receiver;
 }

@@ -20,5 +20,5 @@ public class FindChatRoom extends BaseDateEntity {
     private FindPost findPost;
 
     @ManyToOne
-    private Member reporter;
+    private Member receiver;
 }
