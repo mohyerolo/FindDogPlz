@@ -3,6 +3,7 @@ package com.pesonal.FindDogPlz.map.dto;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.pesonal.FindDogPlz.post.domain.FindPost;
 import com.pesonal.FindDogPlz.post.domain.LostPost;
+import com.pesonal.FindDogPlz.post.dto.PostType;
 import lombok.*;
 
 import java.time.LocalDateTime;
