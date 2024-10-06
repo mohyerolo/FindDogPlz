@@ -20,12 +20,27 @@ public class LostChatRoom extends BaseDateEntity {
     @ManyToOne
     private LostPost lostPost;
 
+    @OneToOne(fetch = FetchType.EAGER)
+    private LostChat lastChatMsg;
+
     @ManyToOne
-    private Member reporter;
+    private Member member1;
+
+    @ManyToOne
+    private Member member2;
 
     @Builder
-    public LostChatRoom(LostPost lostPost, Member reporter) {
+    public LostChatRoom(LostPost lostPost, Member roomMaker, Member invitee) {
         this.lostPost = lostPost;
-        this.reporter = reporter;
+        this.member1 = roomMaker;
+        this.member2 = invitee;
+    }
+
+    public Member getReceiver(Long senderId) {
+        return member1.getId().equals(senderId) ? member2 : member1;
+    }
+
+    public boolean isNewlyCreated() {
+        return lastChatMsg == null;
     }
 }
