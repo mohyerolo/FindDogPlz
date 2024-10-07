@@ -5,5 +5,5 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Slice;
 
 public interface ChatQueryRepository {
-    Slice<ChatMessageDto> getChatsByLastLostChatId(Long lastLostChatId, Pageable pageable);
+    Slice<ChatMessageDto> getChatsByLastLostChatId(Long lostChatRoomId, Long lastLostChatId, Pageable pageable);
 }

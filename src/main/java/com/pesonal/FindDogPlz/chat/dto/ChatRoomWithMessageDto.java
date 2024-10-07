@@ -5,8 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
+import org.springframework.data.domain.Slice;
 
 @Getter
 @NoArgsConstructor
@@ -18,5 +17,9 @@ public class ChatRoomWithMessageDto {
 
     private PostSubDto postInfo;
 
-    private List<ChatMessageDto> chatMessageList;
+    private Slice<ChatMessageDto> chatMessageList;
+
+    public void addChatMessage(Slice<ChatMessageDto> list) {
+        this.chatMessageList = list;
+    }
 }

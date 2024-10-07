@@ -20,11 +20,13 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository{
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Slice<ChatMessageDto> getChatsByLastLostChatId(Long lastLostChatId, Pageable pageable) {
+    public Slice<ChatMessageDto> getChatsByLastLostChatId(Long lostChatRoomId, Long lastLostChatId, Pageable pageable) {
         List<ChatMessageDto> results = jpaQueryFactory.select(new QChatMessageDto(lostChat.id, lostChat.sender.id, lostChat.sender.name, lostChat.message, lostChat.checked))
                 .from(lostChat)
                 .join(lostChat.sender)
-                .where(ltLostChatId(lastLostChatId))
+                .where(lostChat.chatRoom.id.eq(lostChatRoomId),
+                        ltLostChatId(lastLostChatId)
+                )
                 .orderBy(lostChat.id.desc())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();

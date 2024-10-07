@@ -1,7 +1,9 @@
 package com.pesonal.FindDogPlz.chat.application;
 
 import com.pesonal.FindDogPlz.chat.domain.LostChatRoom;
+import com.pesonal.FindDogPlz.chat.dto.ChatMessageDto;
 import com.pesonal.FindDogPlz.chat.dto.ChatRoomWithMessageDto;
+import com.pesonal.FindDogPlz.chat.repository.ChatQueryRepository;
 import com.pesonal.FindDogPlz.chat.repository.LostChatRepository;
 import com.pesonal.FindDogPlz.chat.repository.LostChatRoomRepository;
 import com.pesonal.FindDogPlz.global.exception.CustomException;
@@ -12,6 +14,8 @@ import com.pesonal.FindDogPlz.post.domain.LostPost;
 import com.pesonal.FindDogPlz.post.dto.PostSubDto;
 import com.pesonal.FindDogPlz.post.repository.LostPostRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,18 +27,22 @@ public class LostChatService {
     private final LostPostRepository lostPostRepository;
     private final LostChatRoomRepository lostChatRoomRepository;
     private final LostChatRepository lostChatRepository;
+    private final ChatQueryRepository chatQueryRepository;
 
     @Transactional
     public ChatRoomWithMessageDto enterChatRoom(Member sender, Long receiverId, Long lostPostId) {
-        LostChatRoom lostChatRoom = lostChatRoomRepository
-                .findByLostPostIdAndReporterId(lostPostId, receiverId)
-                .orElseGet(() -> createChatRoom(sender, receiverId, lostPostId));
-
+        LostChatRoom lostChatRoom = findOrCreateChatRoom(sender, receiverId, lostPostId);
         Member receiver = lostChatRoom.getReceiver(sender.getId());
 
-        // TODO: 새로 만든 게 아닐때는 Slice 사용해서 채팅 메시지 가져오게
-        return lostChatRoom.isNewlyCreated() ? createBasicChatRoomWithMessageDto(lostChatRoom, receiver.getName())
-                : null;
+        ChatRoomWithMessageDto chatRoomDto = createBasicChatRoomDto(lostChatRoom, receiver.getName());
+        if (!lostChatRoom.isNewlyCreated()) addChatMessages(chatRoomDto);
+        return chatRoomDto;
+    }
+
+    private LostChatRoom findOrCreateChatRoom(Member sender, Long receiverId, Long lostPostId) {
+        return lostChatRoomRepository
+                .findByLostPostIdAndSenderAndReceiver(lostPostId, sender.getId(), receiverId)
+                .orElseGet(() -> createChatRoom(sender, receiverId, lostPostId));
     }
 
     private LostChatRoom createChatRoom(Member sender, Long receiverId, Long lostPostId) {
@@ -44,12 +52,17 @@ public class LostChatService {
         return lostChatRoomRepository.save(lostChatRoom);
     }
 
-    private ChatRoomWithMessageDto createBasicChatRoomWithMessageDto(LostChatRoom lostChatRoom, String receiverName) {
+    private ChatRoomWithMessageDto createBasicChatRoomDto(LostChatRoom lostChatRoom, String receiverName) {
         return ChatRoomWithMessageDto.builder()
                 .chatRoomId(lostChatRoom.getId())
-                .postInfo(PostSubDto.lostPostBuilder().lostPost(lostChatRoom.getLostPost()).lostPostBuild())
+                .postInfo(PostSubDto.fromLostPost(lostChatRoom.getLostPost()))
                 .chatRoomName(receiverName)
                 .build();
     }
 
+    private void addChatMessages(ChatRoomWithMessageDto basicDto) {
+        PageRequest pageRequest = PageRequest.ofSize(6);
+        Slice<ChatMessageDto> chatList = chatQueryRepository.getChatsByLastLostChatId(basicDto.getChatRoomId(), null, pageRequest);
+        basicDto.addChatMessage(chatList);
+    }
 }

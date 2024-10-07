@@ -7,22 +7,25 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
+@Builder
 public class PostSubDto {
     private Long id;
     private PostType type;
     private String title;
 
-    @Builder(builderMethodName = "lostPostBuilder", buildMethodName = "lostPostBuild")
-    public PostSubDto(LostPost lostPost) {
-        this.id = lostPost.getId();
-        this.type = PostType.LOST;
-        this.title = lostPost.getAnimalName();
+    public static PostSubDto fromLostPost(LostPost lostPost) {
+        return PostSubDto.builder()
+                .id(lostPost.getId())
+                .type(PostType.LOST)
+                .title(lostPost.getAnimalName())
+                .build();
     }
 
-    @Builder(builderMethodName = "findPostBuilder", buildMethodName = "findPostBuild")
-    public PostSubDto(FindPost findPost) {
-        this.id = findPost.getId();
-        this.type = PostType.FIND;
-        this.title = findPost.getFeatures();
+    public static PostSubDto fromFindPost(FindPost findPost) {
+        return PostSubDto.builder()
+                .id(findPost.getId())
+                .type(PostType.FIND)
+                .title(findPost.getFeatures())
+                .build();
     }
 }
