@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-import static com.pesonal.FindDogPlz.chat.domain.QLostChat.lostChat;
+import static com.pesonal.FindDogPlz.chat.domain.QChatMessage.chatMessage;
 
 @Repository
 @RequiredArgsConstructor
@@ -20,14 +20,14 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository{
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Slice<ChatMessageDto> getChatsByLastLostChatId(Long lostChatRoomId, Long lastLostChatId, Pageable pageable) {
-        List<ChatMessageDto> results = jpaQueryFactory.select(new QChatMessageDto(lostChat.id, lostChat.sender.id, lostChat.sender.name, lostChat.message, lostChat.checked))
-                .from(lostChat)
-                .join(lostChat.sender)
-                .where(lostChat.chatRoom.id.eq(lostChatRoomId),
+    public Slice<ChatMessageDto> getChatsByLastLostChatId(Long chatRoomId, Long lastLostChatId, Pageable pageable) {
+        List<ChatMessageDto> results = jpaQueryFactory.select(new QChatMessageDto(chatMessage.id, chatMessage.sender.id, chatMessage.sender.name, chatMessage.message, chatMessage.checked))
+                .from(chatMessage)
+                .join(chatMessage.sender)
+                .where(chatMessage.chatRoom.id.eq(chatRoomId),
                         ltLostChatId(lastLostChatId)
                 )
-                .orderBy(lostChat.id.desc())
+                .orderBy(chatMessage.id.desc())
                 .limit(pageable.getPageSize() + 1)
                 .fetch();
 
@@ -40,7 +40,7 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository{
         return new SliceImpl<>(results, pageable, hasNext);
     }
 
-    private BooleanExpression ltLostChatId(Long lastLostChatId) {
-        return lastLostChatId != null ? lostChat.id.lt(lastLostChatId) : null;
+    private BooleanExpression ltLostChatId(Long lastChatId) {
+        return lastChatId != null ? chatMessage.id.lt(lastChatId) : null;
     }
 }

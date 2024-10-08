@@ -10,17 +10,19 @@ import lombok.*;
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class LostChat extends BaseDateEntity {
+@AllArgsConstructor
+@Builder
+public class ChatMessage extends BaseDateEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne
-    private Member sender;
+    private ChatRoom chatRoom;
 
     @ManyToOne
-    private LostChatRoom chatRoom;
+    private Member sender;
 
     @NotBlank
     private String message;
