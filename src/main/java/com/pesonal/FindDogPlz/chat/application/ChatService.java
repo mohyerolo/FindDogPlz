@@ -11,9 +11,11 @@ import com.pesonal.FindDogPlz.chat.repository.ChatRoomRepository;
 import com.pesonal.FindDogPlz.global.exception.CustomException;
 import com.pesonal.FindDogPlz.global.exception.ErrorCode;
 import com.pesonal.FindDogPlz.member.domain.Member;
+import com.pesonal.FindDogPlz.member.domain.MemberAdapter;
 import com.pesonal.FindDogPlz.member.repository.MemberRepository;
 import com.pesonal.FindDogPlz.post.domain.LostPost;
 import com.pesonal.FindDogPlz.post.dto.PostSubDto;
+import com.pesonal.FindDogPlz.post.dto.PostType;
 import com.pesonal.FindDogPlz.post.repository.LostPostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -23,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-public class LostChatService {
+public class ChatService {
 
     private final MemberRepository memberRepository;
     private final LostPostRepository lostPostRepository;
@@ -32,8 +34,8 @@ public class LostChatService {
     private final ChatQueryRepository chatQueryRepository;
 
     @Transactional
-    public ChatRoomWithMessageDto enterChatRoom(Member sender, Long receiverId, Long lostPostId) {
-        ChatRoom chatRoom = findOrCreateChatRoom(sender, receiverId, lostPostId);
+    public ChatRoomWithMessageDto enterChatRoom(Member sender, Long receiverId, PostType type, Long postId) {
+        ChatRoom chatRoom = findOrCreateChatRoom(sender, receiverId, postId);
         Member receiver = chatRoom.getReceiver(sender.getId());
 
         ChatRoomWithMessageDto chatRoomDto = createBasicChatRoomDto(chatRoom, receiver.getName());
@@ -69,15 +71,17 @@ public class LostChatService {
     }
 
     @Transactional
-    public void saveMessage(ChatMessageReqDto dto, Member sender) {
+    public void saveMessage(ChatMessageReqDto dto, MemberAdapter sender) {
         ChatRoom chatRoom = chatRoomRepository.findById(dto.getChatRoomId()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "채팅방이 존재하지 않습니다."));
 
         ChatMessage chatMessage = ChatMessage.builder()
                 .chatRoom(chatRoom)
-                .sender(sender)
+                .sender(sender.getMember())
                 .message(dto.getMessage())
                 .checked(false)
                 .build();
         chatRepository.save(chatMessage);
+
+        chatRoom.updateLastChat(chatMessage);
     }
 }

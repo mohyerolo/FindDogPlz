@@ -20,22 +20,22 @@ public class ChatRoom extends BaseDateEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private LostPost lostPost;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private FindPost findPost;
 
     @NotNull
+    @Enumerated(value = EnumType.STRING)
     private PostType postType;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    private ChatMessage lastChatMsg;
+    private String lastChatMsg;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member1;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     private Member member2;
 
     @Builder(builderMethodName = "lostBuilder", buildMethodName = "lostBuild")
@@ -60,5 +60,9 @@ public class ChatRoom extends BaseDateEntity {
 
     public boolean isNewlyCreated() {
         return lastChatMsg == null;
+    }
+
+    public void updateLastChat(ChatMessage chatMessage) {
+        this.lastChatMsg = chatMessage.getMessage();
     }
 }
