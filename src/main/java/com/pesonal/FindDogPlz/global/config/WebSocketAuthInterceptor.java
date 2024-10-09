@@ -41,6 +41,7 @@ public class WebSocketAuthInterceptor implements HandshakeInterceptor {
             Authentication authentication = jwtTokenProvider.getAuthentication(token);
             if (authentication!= null) {
                 attributes.put("sender", SecurityContextHolder.getContext().getAuthentication().getPrincipal());
+                attributes.put("chatRoomId", servletRequest.getHeader("chatRoomId"));
                 return true;
             } else {
                 servletResponse.setStatus(401);

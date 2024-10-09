@@ -11,7 +11,6 @@ import com.pesonal.FindDogPlz.chat.repository.ChatRoomRepository;
 import com.pesonal.FindDogPlz.global.exception.CustomException;
 import com.pesonal.FindDogPlz.global.exception.ErrorCode;
 import com.pesonal.FindDogPlz.member.domain.Member;
-import com.pesonal.FindDogPlz.member.domain.MemberAdapter;
 import com.pesonal.FindDogPlz.member.repository.MemberRepository;
 import com.pesonal.FindDogPlz.post.domain.LostPost;
 import com.pesonal.FindDogPlz.post.dto.PostSubDto;
@@ -71,12 +70,12 @@ public class ChatService {
     }
 
     @Transactional
-    public void saveMessage(ChatMessageReqDto dto, MemberAdapter sender) {
+    public void saveMessage(ChatMessageReqDto dto, Member sender) {
         ChatRoom chatRoom = chatRoomRepository.findById(dto.getChatRoomId()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "채팅방이 존재하지 않습니다."));
 
         ChatMessage chatMessage = ChatMessage.builder()
                 .chatRoom(chatRoom)
-                .sender(sender.getMember())
+                .sender(sender)
                 .message(dto.getMessage())
                 .checked(false)
                 .build();
