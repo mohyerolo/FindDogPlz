@@ -2,6 +2,7 @@ package com.pesonal.FindDogPlz.global.config;
 
 import com.pesonal.FindDogPlz.chat.application.ChatService;
 import com.pesonal.FindDogPlz.chat.dto.ChatMessageReqDto;
+import com.pesonal.FindDogPlz.chat.dto.MessageType;
 import com.pesonal.FindDogPlz.member.domain.MemberAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -24,23 +25,13 @@ public class WebSocketHandler extends TextWebSocketHandler {
     private final ChatService chatService;
 
     @Override
-    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
-        Long chatRoomId = getChatRoomId(session);
-        ConcurrentHashMap<String, WebSocketSession> chatRoomSessions = getChatRoomSessions(chatRoomId);
-        chatRoomSessions.putIfAbsent(session.getId(), session);
-    }
-
-    @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
-        Long chatRoomId = getChatRoomId(session);
-        ConcurrentHashMap<String, WebSocketSession> chatRoomSessions = chatRoomSessionMap.get(chatRoomId);
-        if (chatRoomSessions != null) {
+        chatRoomSessionMap.forEach((chatRoomId, chatRoomSessions) -> {
             chatRoomSessions.remove(session.getId());
-        }
-    }
-
-    private Long getChatRoomId(WebSocketSession session) {
-        return Long.parseLong((String) session.getAttributes().get("chatRoomId"));
+            if (chatRoomSessions.isEmpty()) {
+                chatRoomSessionMap.remove(chatRoomId);
+            }
+        });
     }
 
     @Override
@@ -49,12 +40,18 @@ public class WebSocketHandler extends TextWebSocketHandler {
         ChatMessageReqDto chatMessageReqDto = ChatMessageReqDto.toChatMessage(jsonObject);
         MemberAdapter memberAdapter = (MemberAdapter) session.getAttributes().get("sender");
 
-        chatService.saveMessage(chatMessageReqDto, memberAdapter.getMember());
-
         Long chatRoomId = chatMessageReqDto.getChatRoomId();
         ConcurrentHashMap<String, WebSocketSession> chatRoomSessions = getChatRoomSessions(chatRoomId);
 
-        sendMessageToChatRoom(jsonObject, chatRoomSessions);
+        MessageType messageType= chatMessageReqDto.getType();
+        switch (messageType) {
+            case ENTER -> chatRoomSessions.putIfAbsent(session.getId(), session);
+            case CLOSE -> chatRoomSessions.remove(session.getId());
+            default -> {
+                chatService.saveMessage(chatMessageReqDto, memberAdapter.getMember());
+                sendMessageToChatRoom(jsonObject, chatRoomSessions);
+            }
+        }
     }
 
     private ConcurrentHashMap<String, WebSocketSession> getChatRoomSessions(Long chatRoomId) {
