@@ -7,6 +7,7 @@ import com.pesonal.FindDogPlz.post.dto.LostPostReqDto;
 import com.pesonal.FindDogPlz.post.dto.LostPostUpdateDto;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,6 +15,7 @@ import lombok.NoArgsConstructor;
 import org.locationtech.jts.geom.Point;
 
 import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -22,11 +24,11 @@ public class LostPost extends BaseDateEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Member writer;
 
     @NotNull
-    @Column(length = 20)
+    @Size(min = 1, max = 20)
     private String animalName;
 
     @NotNull

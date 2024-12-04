@@ -24,7 +24,7 @@ public class FindPostService {
     private final FindPostQueryRepository findPostQueryRepository;
 
     @Transactional
-    public void createFindPost(FindPostReqDto dto, Member member) {
+    public void createFindPost(final FindPostReqDto dto, final Member member) {
         Point findPoint = parsePoint(dto.getFindLatitude(), dto.getFindLongitude());
 
         FindPost findPost = FindPost.builder()
@@ -36,7 +36,7 @@ public class FindPostService {
     }
 
     @Transactional
-    public void updateFindPost(Long id, FindPostReqDto dto, Member member) {
+    public void updateFindPost(final Long id, final FindPostReqDto dto, final Member member) {
         FindPost findPost = findPostRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "수정할 공고를 찾지 못했습니다."));
         validateWriter(findPost.getWriter(), member);
 
@@ -44,30 +44,30 @@ public class FindPostService {
         updateFindLocation(findPost, dto);
     }
 
-    private void updateFindLocation(FindPost findPost, FindPostReqDto dto) {
+    private void updateFindLocation(final FindPost findPost, final FindPostReqDto dto) {
         if (!findPost.getLocation().equals(dto.getLocation())) {
             Point findPoint = parsePoint(dto.getFindLatitude(), dto.getFindLongitude());
             findPost.updateFindLocation(dto.getLocation(), findPoint);
         }
     }
 
-    public Slice<FindPostDto> getAllFindPost(Long lastFindPostId, boolean close, int size) {
+    public Slice<FindPostDto> getAllFindPost(final Long lastFindPostId, final boolean close, final int size) {
         PageRequest pageRequest = PageRequest.ofSize(size);
         return findPostQueryRepository.searchAllByLastFindPostId(lastFindPostId, close, pageRequest).map(FindPostDto::new);
     }
 
     @Transactional
-    public void closeFindPost(Long id, Member member) {
+    public void closeFindPost(final Long id, final Member member) {
         FindPost findPost = findPostRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "수정할 공고를 찾지 못했습니다."));
         validateWriter(findPost.getWriter(), member);
         findPost.closePost();
     }
 
-    private Point parsePoint(Double latitude, Double longitude) {
+    private Point parsePoint(final Double latitude, final Double longitude) {
         return PointParser.parsePoint(latitude, longitude);
     }
 
-    private void validateWriter(Member writer, Member member) {
+    private void validateWriter(final Member writer, final Member member) {
         if (!writer.getId().equals(member.getId())) {
             throw new AccessDeniedException("해당 작업이 가능한 사용자가 아닙니다.");
         }

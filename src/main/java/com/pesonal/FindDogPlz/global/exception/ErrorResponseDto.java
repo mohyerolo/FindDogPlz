@@ -13,14 +13,17 @@ public class ErrorResponseDto {
     private String code;
     private String message;
 
-    public static ResponseEntity<ErrorResponseDto> toResponseEntity(ErrorCode e, String message) {
+    public static ResponseEntity<ErrorResponseDto> toResponseEntity(final ErrorCode e, final String message) {
         return ResponseEntity
                 .status(e.getStatus())
-                .body(ErrorResponseDto.builder()
-                        .status(e.getStatus().value())
-                        .code(e.name())
-                        .message(message)
-                        .build()
-                );
+                .body(of(e, message));
+    }
+
+    private static ErrorResponseDto of(final ErrorCode e, final String message) {
+        return ErrorResponseDto.builder()
+                .status(e.getStatus().value())
+                .code(e.name())
+                .message(message)
+                .build();
     }
 }

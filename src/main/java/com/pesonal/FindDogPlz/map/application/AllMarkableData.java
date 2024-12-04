@@ -7,8 +7,6 @@ import java.util.List;
 
 @Component
 public class AllMarkableData implements Markable {
-
-
     @Override
     public List<MapDto> getMarkableData(Double longitude, Double latitude) {
         return null;

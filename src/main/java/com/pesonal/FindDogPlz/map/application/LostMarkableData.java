@@ -22,35 +22,35 @@ public class LostMarkableData implements Markable {
     private final LostPostRepository lostPostRepository;
 
     @Override
-    public List<MapDto> getMarkableData(Double longitude, Double latitude) {
+    public List<MapDto> getMarkableData(final Double longitude, final Double latitude) {
         String pointFormat = GeometryUtil.calculateAndFormatPoint(latitude, longitude);
         List<LostPost> lostPostList = findLostPostByLocation(pointFormat);
         Location location = new Location(latitude, longitude);
         return convertToMapDtoList(lostPostList, location);
     }
 
-    private List<LostPost> findLostPostByLocation(String pointFormat) {
+    private List<LostPost> findLostPostByLocation(final String pointFormat) {
         String queryStr = buildQueryString(pointFormat);
         Query query = entityManager.createNativeQuery(queryStr, LostPost.class);
         return query.getResultList();
     }
 
-    private String buildQueryString(String pointFormat) {
+    private String buildQueryString(final String pointFormat) {
         return String.format(
                 "SELECT * FROM lost_post AS lp " +
-                "WHERE lp.completed = 0 and MBRContains(ST_LINESTRINGFROMTEXT(%s), lp.lost_point) " +
-                "ORDER BY lp.id",
+                        "WHERE lp.completed = 0 and MBRContains(ST_LINESTRINGFROMTEXT(%s), lp.lost_point) " +
+                        "ORDER BY lp.id",
                 pointFormat
         );
     }
 
-    private List<MapDto> convertToMapDtoList(List<LostPost> lostPostList, Location location) {
+    private List<MapDto> convertToMapDtoList(final List<LostPost> lostPostList, final Location location) {
         return lostPostList.stream()
                 .map(p -> convertLostPostToMapDto(p, location))
                 .toList();
     }
 
-    private MapDto convertLostPostToMapDto(LostPost lostPost, Location location) {
+    private MapDto convertLostPostToMapDto(final LostPost lostPost, final Location location) {
         Double dist = calcDist(location.getLongitude(), location.getLatitude(), lostPost.getId());
         return MapDto.lostPostBuilder()
                 .lostPost(lostPost)
@@ -58,7 +58,7 @@ public class LostMarkableData implements Markable {
                 .lostPostBuild();
     }
 
-    private Double calcDist(Double longitude, Double latitude, Long lostPostId) {
+    private Double calcDist(final Double longitude, final Double latitude, final Long lostPostId) {
         Point point = PointParser.parsePoint(latitude, longitude);
         return point != null ? lostPostRepository.findDistByPoint(point.getX(), point.getY(), lostPostId) : null;
     }

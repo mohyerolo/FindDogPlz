@@ -1,6 +1,6 @@
 package com.pesonal.FindDogPlz.member.dto;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SignInDto {
-    @NotNull
+    @NotBlank
     private String loginId;
 
-    @NotNull
+    @NotBlank
     private String password;
 }

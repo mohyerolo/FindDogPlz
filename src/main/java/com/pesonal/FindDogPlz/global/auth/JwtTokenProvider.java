@@ -17,36 +17,46 @@ import java.util.stream.Collectors;
 
 @Component
 public class JwtTokenProvider {
+    private static final long ACCESS_TOKEN_EXPIRE_TIME = 30 * 60 * 1000L;
 
     private final Key key;
     private final UserDetailsServiceImpl userDetailsService;
-    private static final long ACCESS_TOKEN_EXPIRE_TIME = 30 * 60 * 1000L;
     private final String GRANT_TYPE = "Bearer";
 
-    public JwtTokenProvider(@Value("${jwt.secret-key}") String secretKey, UserDetailsServiceImpl userDetailsService) {
+    public JwtTokenProvider(@Value("${jwt.secret-key}") final String secretKey, final UserDetailsServiceImpl userDetailsService) {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         this.key = Keys.hmacShaKeyFor(keyBytes);
         this.userDetailsService = userDetailsService;
     }
 
-    public TokenInfoDto generateToken(Authentication authentication) {
-        String authorities = authentication.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
+    public TokenInfoDto generateToken(final Authentication authentication) {
+        String token = createTokenAsCondition(authentication);
+        return new TokenInfoDto(GRANT_TYPE, token);
+    }
 
-        Date now = new Date();
-        Date expireDate = new Date(now.getTime() + ACCESS_TOKEN_EXPIRE_TIME);
+    private String createTokenAsCondition(final Authentication authentication) {
+        String authorities = getAuthorities(authentication);
+        Date expireDate = getExpireDate();
 
-        String token = Jwts.builder()
+        return Jwts.builder()
                 .setSubject(authentication.getName())
                 .claim("authorities", authorities)
                 .setExpiration(expireDate)
                 .signWith(key)
                 .compact();
-        return new TokenInfoDto(GRANT_TYPE, token);
     }
 
-    public boolean validateToken(String token) throws JwtException {
+    private String getAuthorities(final Authentication authentication) {
+        return authentication.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+    }
+
+    private Date getExpireDate() {
+        return new Date(new Date().getTime() + ACCESS_TOKEN_EXPIRE_TIME);
+    }
+
+    public boolean validateToken(final String token) throws JwtException {
         try {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
@@ -61,9 +71,17 @@ public class JwtTokenProvider {
         }
     }
 
-    public Authentication getAuthentication(String accessToken) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(accessToken).getBody();
+    public Authentication getAuthentication(final String accessToken) {
+        Claims claims = createClaims(accessToken);
         UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
         return new UsernamePasswordAuthenticationToken(userDetails, accessToken, userDetails.getAuthorities());
+    }
+
+    private Claims createClaims(final String accessToken) {
+        return Jwts.parserBuilder()
+                .setSigningKey(key)
+                .build()
+                .parseClaimsJws(accessToken)
+                .getBody();
     }
 }

@@ -18,7 +18,10 @@ public class FindPostDto {
     @NotNull
     private Long id;
 
+    @NotNull
     private Long writerId;
+
+    @NotBlank
     private String writerName;
 
     @NotBlank
@@ -33,12 +36,15 @@ public class FindPostDto {
     @NotBlank
     private String findLocation;
 
+    @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime findDate;
 
+    @NotNull
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private LocalDateTime createdDate;
 
+    @NotNull
     private boolean completed;
 
     @Builder

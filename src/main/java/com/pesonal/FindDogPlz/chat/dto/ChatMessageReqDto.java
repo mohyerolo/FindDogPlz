@@ -1,5 +1,7 @@
 package com.pesonal.FindDogPlz.chat.dto;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import org.json.JSONObject;
 
@@ -8,8 +10,13 @@ import org.json.JSONObject;
 @AllArgsConstructor
 @Builder
 public class ChatMessageReqDto {
+    @NotNull
     private Long chatRoomId;
+
+    @NotBlank
     private String message;
+
+    @NotNull
     private MessageType type;
 
     public static ChatMessageReqDto toChatMessage(JSONObject jsonObject) {

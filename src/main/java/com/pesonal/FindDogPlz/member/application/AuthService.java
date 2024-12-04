@@ -1,7 +1,6 @@
 package com.pesonal.FindDogPlz.member.application;
 
 import com.pesonal.FindDogPlz.global.auth.JwtTokenProvider;
-import com.pesonal.FindDogPlz.global.util.PointParser;
 import com.pesonal.FindDogPlz.global.exception.CustomException;
 import com.pesonal.FindDogPlz.global.exception.ErrorCode;
 import com.pesonal.FindDogPlz.member.domain.Member;
@@ -28,7 +27,7 @@ public class AuthService {
     private final PasswordEncoder encoder;
 
     @Transactional
-    public void signUp(SignUpDto dto) {
+    public void signUp(final SignUpDto dto) {
         validateDuplicateId(dto.getLoginId());
         Member member = Member.builder()
                 .signUpDto(dto)
@@ -37,14 +36,13 @@ public class AuthService {
         memberRepository.save(member);
     }
 
-    private void validateDuplicateId(String loginId) {
+    private void validateDuplicateId(final String loginId) {
         if (memberRepository.existsByLoginId(loginId)) {
             throw new CustomException(ErrorCode.DUPLICATED_LOGIN_ID);
         }
     }
 
-
-    public TokenInfoDto signIn(SignInDto dto) {
+    public TokenInfoDto signIn(final SignInDto dto) {
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(dto.getLoginId(), dto.getPassword());
         Authentication authenticate = authenticationManagerBuilder.getObject().authenticate(authenticationToken);
         return jwtTokenProvider.generateToken(authenticate);

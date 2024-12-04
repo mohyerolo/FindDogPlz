@@ -18,10 +18,11 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class FindPost extends BaseDateEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private Member writer;
 
     @NotNull
@@ -63,7 +64,7 @@ public class FindPost extends BaseDateEntity {
         this.completed = false;
     }
 
-    public void updatePost(FindPostReqDto dto) {
+    public void updatePost(final FindPostReqDto dto) {
         this.features = dto.getFeatures();
         this.gender = dto.getGender();
         this.lead = dto.isLead();
@@ -71,7 +72,7 @@ public class FindPost extends BaseDateEntity {
         this.findDate = dto.getFindDate();
     }
 
-    public void updateFindLocation(String location, Point findPoint) {
+    public void updateFindLocation(final String location, final Point findPoint) {
         this.location = location;
         this.locPoint = findPoint;
     }

@@ -20,18 +20,8 @@ public class FindPostQueryRepositoryImpl implements FindPostQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Slice<FindPost> searchAllByLastFindPostId(Long lastFindPostId, boolean close, Pageable pageable) {
-        List<FindPost> results = jpaQueryFactory
-                .selectFrom(findPost)
-                .innerJoin(findPost.writer)
-                .where(
-                        ltFindPostId(lastFindPostId),
-                        findPost.completed.eq(close)
-                )
-                .orderBy(findPost.id.desc())
-                .limit(pageable.getPageSize() + 1)
-                .fetchJoin()
-                .fetch();
+    public Slice<FindPost> searchAllByLastFindPostId(final Long lastFindPostId, final boolean close, final Pageable pageable) {
+        List<FindPost> results = executeQuery(lastFindPostId, close, pageable);
 
         boolean hasNext = false;
         if (results.size() > pageable.getPageSize()) {
@@ -42,7 +32,21 @@ public class FindPostQueryRepositoryImpl implements FindPostQueryRepository {
         return new SliceImpl<>(results, pageable, hasNext);
     }
 
-    private BooleanExpression ltFindPostId(Long findPostId) {
+    private List<FindPost> executeQuery(final Long lastFindPostId, final boolean close, final Pageable pageable) {
+        return jpaQueryFactory
+                .selectFrom(findPost)
+                .innerJoin(findPost.writer)
+                .where(
+                        ltFindPostId(lastFindPostId),
+                        findPost.completed.eq(close)
+                )
+                .orderBy(findPost.id.desc())
+                .limit(pageable.getPageSize() + 1)
+                .fetchJoin()
+                .fetch();
+    }
+
+    private BooleanExpression ltFindPostId(final Long findPostId) {
         return findPostId != null ? findPost.id.lt(findPostId) : null;
     }
 }

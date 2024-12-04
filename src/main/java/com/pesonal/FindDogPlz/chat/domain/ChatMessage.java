@@ -3,8 +3,8 @@ package com.pesonal.FindDogPlz.chat.domain;
 import com.pesonal.FindDogPlz.global.common.BaseDateEntity;
 import com.pesonal.FindDogPlz.member.domain.Member;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Entity
@@ -18,13 +18,14 @@ public class ChatMessage extends BaseDateEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private ChatRoom chatRoom;
 
-    @ManyToOne
+    @ManyToOne(optional = false)
     private Member sender;
 
-    @NotBlank
+    @NotNull
+    @Size(min = 1)
     private String message;
 
     @NotNull

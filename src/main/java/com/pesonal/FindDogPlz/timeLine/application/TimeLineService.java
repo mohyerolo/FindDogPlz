@@ -23,7 +23,7 @@ public class TimeLineService {
     private final ReportRepository reportRepository;
 
     @Transactional
-    public void includeReportInTheTimeLine(Long reportId, boolean finalLoc, Member lostPostWriter) {
+    public void includeReportInTheTimeLine(final Long reportId, final boolean finalLoc, final Member lostPostWriter) {
         Report report = findReport(reportId);
         validateMemberIsLostPostWriter(report.getLostPost(), lostPostWriter);
 
@@ -32,7 +32,7 @@ public class TimeLineService {
         updateRelatedDetails(report, finalLoc);
     }
 
-    private TimeLine createTimeLineFromReport(Report report) {
+    private TimeLine createTimeLineFromReport(final Report report) {
         return TimeLine.builder()
                 .lostPost(report.getLostPost())
                 .report(report)
@@ -40,31 +40,31 @@ public class TimeLineService {
                 .build();
     }
 
-    private void updateRelatedDetails(Report report, boolean finalLoc) {
+    private void updateRelatedDetails(final Report report, final boolean finalLoc) {
         if (finalLoc) {
             updateLostPostLocation(report);
         }
         report.includedInTimeLine();
     }
 
-    private void updateLostPostLocation(Report report) {
+    private void updateLostPostLocation(final Report report) {
         LostPost lostPost = report.getLostPost();
         lostPost.updateFinalLocation(report.getFindLocation(), report.getPoint());
     }
 
-    private Report findReport(Long reportId) {
+    private Report findReport(final Long reportId) {
         return reportRepository.findById(reportId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
     }
 
-    private void validateMemberIsLostPostWriter(LostPost lostPost, Member member) {
+    private void validateMemberIsLostPostWriter(final LostPost lostPost, final Member member) {
         if (!lostPost.getWriter().getId().equals(member.getId())) {
             throw new AccessDeniedException("해당 작업이 가능한 사용자가 아닙니다.");
         }
     }
 
     @Transactional
-    public List<TimeLineDto> getTimeLineForLostPost(Long lostPostId) {
+    public List<TimeLineDto> getTimeLineForLostPost(final Long lostPostId) {
         List<TimeLine> timeLineList = timeLineRepository.findByLostPostIdOrderByReportedDateDesc(lostPostId);
         return timeLineList.stream().map(TimeLineDto::new).toList();
     }

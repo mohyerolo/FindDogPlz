@@ -18,8 +18,20 @@ import static com.pesonal.FindDogPlz.report.domain.QReport.report;
 public class ReportQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Slice<Report> searchAllReportByLostPostIdAndLastReportId(Long postId, Long lastReportId, Pageable pageable) {
-        List<Report> results = jpaQueryFactory
+    public Slice<Report> searchAllReportByLostPostIdAndLastReportId(final Long postId, final Long lastReportId, final Pageable pageable) {
+        List<Report> results = executeQuery(postId, lastReportId, pageable);
+
+        boolean hasNext = false;
+        if (results.size() > pageable.getPageSize()) {
+            hasNext = true;
+            results.remove(pageable.getPageSize());
+        }
+
+        return new SliceImpl<>(results, pageable, hasNext);
+    }
+
+    private List<Report> executeQuery(final Long postId, final Long lastReportId, final Pageable pageable) {
+        return jpaQueryFactory
                 .selectFrom(report)
                 .innerJoin(report.writer)
                 .where(report.lostPost.id.eq(postId),
@@ -29,14 +41,6 @@ public class ReportQueryRepository {
                 .limit(pageable.getPageSize() + 1)
                 .fetchJoin()
                 .fetch();
-
-        boolean hasNext = false;
-        if (results.size() > pageable.getPageSize()) {
-            hasNext = true;
-            results.remove(pageable.getPageSize());
-        }
-
-        return new SliceImpl<>(results, pageable, hasNext);
     }
 
     private BooleanExpression ltReportId(Long reportId) {

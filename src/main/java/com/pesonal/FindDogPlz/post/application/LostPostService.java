@@ -23,21 +23,32 @@ public class LostPostService {
     private final LostPostQueryRepository lostPostQueryRepository;
 
     @Transactional
-    public void createLostPost(LostPostReqDto dto, Member member) {
-        Point lostPoint = parsePoint(dto.getLostLatitude(), dto.getLostLongitude());
-        Point finalPoint = dto.isLostLocEqualFinalLoc() ? lostPoint : parsePoint(dto.getFinalLatitude(), dto.getFinalLongitude());
+    public void createLostPost(final LostPostReqDto dto, final Member member) {
+        LostPost lostPost = createLostPostWithPoint(dto, member);
+        lostPostRepository.save(lostPost);
+    }
 
-        LostPost lostPost = LostPost.builder()
+    private LostPost createLostPostWithPoint(final LostPostReqDto dto, final Member member) {
+        Point lostPoint = parsePoint(dto.getLostLatitude(), dto.getLostLongitude());
+        Point finalPoint = findFinalPoint(dto, lostPoint);
+
+        return LostPost.builder()
                 .dto(dto)
                 .writer(member)
                 .lostPoint(lostPoint)
                 .finalPoint(finalPoint)
                 .build();
-        lostPostRepository.save(lostPost);
+    }
+
+    private Point findFinalPoint(final LostPostReqDto dto, final Point lostPoint) {
+        if (dto.isLostLocEqualFinalLoc()) {
+            return lostPoint;
+        }
+        return parsePoint(dto.getFinalLatitude(), dto.getFinalLongitude());
     }
 
     @Transactional
-    public Long updateLostPost(Long id, LostPostUpdateDto dto, Member member) {
+    public Long updateLostPost(final Long id, final LostPostUpdateDto dto, final Member member) {
         LostPost lostPost = lostPostRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "수정하려는 공고를 찾을 수 없습니다."));
 
         validateWriter(lostPost.getWriter(), member);
@@ -50,26 +61,26 @@ public class LostPostService {
         return lostPost.getId();
     }
 
-    private void updateLostLocation(LostPost lostPost, LostLocationUpdateDto dto) {
+    private void updateLostLocation(final LostPost lostPost, final LostLocationUpdateDto dto) {
         if (!lostPost.getLostLocation().equals(dto.getLostLocation())) {
             Point lostPoint = parsePoint(dto.getLatitude(), dto.getLongitude());
             lostPost.updateLostLocation(dto.getLostLocation(), lostPoint);
         }
     }
 
-    private void updateFinalLocation(LostPost lostPost, FinalLocationUpdateDto dto) {
+    private void updateFinalLocation(final LostPost lostPost, final FinalLocationUpdateDto dto) {
         if (!lostPost.getFinalLocation().equals(dto.getFinalLocation())) {
             Point finalPoint = parsePoint(dto.getLatitude(), dto.getLongitude());
             lostPost.updateFinalLocation(dto.getFinalLocation(), finalPoint);
         }
     }
 
-    public Slice<LostPostOutlineDto> getAllLostPost(Long lastLostPostId, boolean close, int size) {
+    public Slice<LostPostOutlineDto> getAllLostPost(final Long lastLostPostId, final boolean close, final int size) {
         PageRequest pageRequest = PageRequest.ofSize(size);
         return lostPostQueryRepository.searchByLastPostId(lastLostPostId, close, pageRequest);
     }
 
-    public LostPostDetailDto getLostPostById(Long id) {
+    public LostPostDetailDto getLostPostById(final Long id) {
         return lostPostRepository.findById(id)
                 .map(lostPost -> LostPostDetailDto.builder()
                         .lostPost(lostPost)
@@ -79,17 +90,17 @@ public class LostPostService {
     }
 
     @Transactional
-    public void closeLostPost(Long id, Member member) {
+    public void closeLostPost(final Long id, final Member member) {
         LostPost lostPost = lostPostRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "수정하려는 공고를 찾을 수 없습니다."));
         validateWriter(lostPost.getWriter(), member);
         lostPost.closePost();
     }
 
-    private Point parsePoint(Double latitude, Double longitude) {
+    private Point parsePoint(final Double latitude, final Double longitude) {
         return PointParser.parsePoint(latitude, longitude);
     }
 
-    private void validateWriter(Member writer, Member member) {
+    private void validateWriter(final Member writer, final Member member) {
         if (!writer.getId().equals(member.getId())) {
             throw new AccessDeniedException("해당 작업이 가능한 사용자가 아닙니다.");
         }

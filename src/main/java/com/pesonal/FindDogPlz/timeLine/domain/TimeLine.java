@@ -16,13 +16,14 @@ import java.time.LocalDateTime;
 @Builder
 public class TimeLine extends BaseDateEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private LostPost lostPost;
 
-    @OneToOne
+    @OneToOne(optional = false)
     private Report report;
 
     @NotNull

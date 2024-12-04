@@ -33,7 +33,7 @@ public class ChatService {
     private final ChatQueryRepository chatQueryRepository;
 
     @Transactional
-    public ChatRoomWithMessageDto enterChatRoom(Member sender, Long receiverId, PostType type, Long postId) {
+    public ChatRoomWithMessageDto enterChatRoom(final Member sender, final Long receiverId, final PostType type, final Long postId) {
         ChatRoom chatRoom = findOrCreateChatRoom(sender, receiverId, postId);
         Member receiver = chatRoom.getReceiver(sender.getId());
 
@@ -42,20 +42,20 @@ public class ChatService {
         return chatRoomDto;
     }
 
-    private ChatRoom findOrCreateChatRoom(Member sender, Long receiverId, Long lostPostId) {
+    private ChatRoom findOrCreateChatRoom(final Member sender, final Long receiverId, final Long lostPostId) {
         return chatRoomRepository
                 .findByLostPostIdAndSenderAndReceiver(lostPostId, sender.getId(), receiverId)
                 .orElseGet(() -> createChatRoom(sender, receiverId, lostPostId));
     }
 
-    private ChatRoom createChatRoom(Member sender, Long receiverId, Long lostPostId) {
+    private ChatRoom createChatRoom(final Member sender, final Long receiverId, final Long lostPostId) {
         LostPost lostPost = lostPostRepository.findById(lostPostId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "실종 공고를 찾을 수 없습니다"));
         Member receiver = memberRepository.findById(receiverId).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "해당 회원을 찾을 수 없습니다."));
         ChatRoom chatRoom = ChatRoom.lostBuilder().lostPost(lostPost).roomMaker(sender).invitee(receiver).lostBuild();
         return chatRoomRepository.save(chatRoom);
     }
 
-    private ChatRoomWithMessageDto createBasicChatRoomDto(ChatRoom chatRoom, String receiverName) {
+    private ChatRoomWithMessageDto createBasicChatRoomDto(final ChatRoom chatRoom, final String receiverName) {
         return ChatRoomWithMessageDto.builder()
                 .chatRoomId(chatRoom.getId())
                 .postInfo(PostSubDto.fromLostPost(chatRoom.getLostPost()))
@@ -63,14 +63,14 @@ public class ChatService {
                 .build();
     }
 
-    private void addChatMessages(ChatRoomWithMessageDto basicDto) {
+    private void addChatMessages(final ChatRoomWithMessageDto basicDto) {
         PageRequest pageRequest = PageRequest.ofSize(6);
         Slice<ChatMessageDto> chatList = chatQueryRepository.getChatsByLastLostChatId(basicDto.getChatRoomId(), null, pageRequest);
         basicDto.addChatMessage(chatList);
     }
 
     @Transactional
-    public void saveMessage(ChatMessageReqDto dto, Member sender) {
+    public void saveMessage(final ChatMessageReqDto dto, final Member sender) {
         ChatRoom chatRoom = chatRoomRepository.findById(dto.getChatRoomId()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "채팅방이 존재하지 않습니다."));
 
         ChatMessage chatMessage = ChatMessage.builder()

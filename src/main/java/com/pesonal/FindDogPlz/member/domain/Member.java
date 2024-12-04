@@ -19,7 +19,8 @@ import java.util.List;
 @Getter
 public class Member extends BaseDateEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @NotNull
@@ -39,7 +40,7 @@ public class Member extends BaseDateEntity {
     private List<String> roles = new ArrayList<>();
 
     @Builder
-    public Member(SignUpDto signUpDto, PasswordEncoder pwEncoder) {
+    public Member(final SignUpDto signUpDto, final PasswordEncoder pwEncoder) {
         this.loginId = signUpDto.getLoginId();
         this.password = pwEncoder.encode(signUpDto.getPassword());
         this.name = signUpDto.getName();

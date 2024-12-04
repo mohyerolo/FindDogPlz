@@ -28,20 +28,24 @@ public class ReportService {
     private final LostPostRepository lostPostRepository;
 
     @Transactional
-    public void createReport(Long postId, ReportReqDto dto, Member member) {
+    public void createReport(final Long postId, final ReportReqDto dto, final Member member) {
         LostPost lostPost = lostPostRepository.findById(postId).orElseThrow(() -> new CustomException(ErrorCode.ACCEPTABLE_BUT_EMPTY, "제보하려던 공고가 없습니다."));
 
-        Report report = Report.builder()
+        Report report = createReport(lostPost, dto, member);
+        reportRepository.save(report);
+    }
+
+    private Report createReport(final LostPost lostPost, final ReportReqDto dto, final Member member) {
+        return Report.builder()
                 .dto(dto)
                 .point(parsePoint(dto.getFindLatitude(), dto.getFindLongitude()))
                 .member(member)
                 .lostPost(lostPost)
                 .build();
-        reportRepository.save(report);
     }
 
     @Transactional
-    public void updateReport(Long id, ReportReqDto dto, Member member) {
+    public void updateReport(final Long id, final ReportReqDto dto, final Member member) {
         Report report = findReport(id);
         validateWriter(report.getWriter(), member);
 
@@ -49,20 +53,20 @@ public class ReportService {
         updateFindLocation(report, dto);
     }
 
-    private void updateFindLocation(Report report, ReportReqDto dto) {
+    private void updateFindLocation(final Report report, final ReportReqDto dto) {
         if (!report.getFindLocation().equals(dto.getFindLocation())) {
             Point findPoint = parsePoint(dto.getFindLatitude(), dto.getFindLongitude());
             report.updateLocation(dto.getFindLocation(), findPoint);
         }
     }
 
-    public Slice<ReportDto> getAllReportForLostPost(Long postId, Long lastReportId, int size) {
+    public Slice<ReportDto> getAllReportForLostPost(final Long postId, final Long lastReportId, final int size) {
         PageRequest pageRequest = PageRequest.ofSize(size);
         return reportQueryRepository.searchAllReportByLostPostIdAndLastReportId(postId, lastReportId, pageRequest).map(ReportDto::new);
     }
 
     @Transactional
-    public void deleteReport(Long reportId, Member reportWriter) {
+    public void deleteReport(final Long reportId, final Member reportWriter) {
         Report report = findReport(reportId);
         validateWriter(report.getWriter(), reportWriter);
 
@@ -70,23 +74,23 @@ public class ReportService {
     }
 
     @Transactional
-    public void excludeReportByLostPostWriter(Long reportId, Member lostPostWriter) {
+    public void excludeReportByLostPostWriter(final Long reportId, final Member lostPostWriter) {
         Report report = findReport(reportId);
         validateWriter(report.getLostPost().getWriter(), lostPostWriter);
 
         reportRepository.delete(report);
     }
 
-    private Report findReport(Long reportId) {
+    private Report findReport(final Long reportId) {
         return reportRepository.findById(reportId)
                 .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND));
     }
 
-    private Point parsePoint(Double latitude, Double longitude) {
+    private Point parsePoint(final Double latitude, final Double longitude) {
         return PointParser.parsePoint(latitude, longitude);
     }
 
-    private void validateWriter(Member writer, Member member) {
+    private void validateWriter(final Member writer, final Member member) {
         if (!writer.getId().equals(member.getId())) {
             throw new AccessDeniedException("해당 작업이 가능한 사용자가 아닙니다.");
         }

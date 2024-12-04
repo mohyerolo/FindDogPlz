@@ -16,20 +16,12 @@ import static com.pesonal.FindDogPlz.chat.domain.QChatMessage.chatMessage;
 
 @Repository
 @RequiredArgsConstructor
-public class ChatQueryRepositoryImpl implements ChatQueryRepository{
+public class ChatQueryRepositoryImpl implements ChatQueryRepository {
     private final JPAQueryFactory jpaQueryFactory;
 
     @Override
-    public Slice<ChatMessageDto> getChatsByLastLostChatId(Long chatRoomId, Long lastLostChatId, Pageable pageable) {
-        List<ChatMessageDto> results = jpaQueryFactory.select(new QChatMessageDto(chatMessage.id, chatMessage.sender.id, chatMessage.sender.name, chatMessage.message, chatMessage.checked))
-                .from(chatMessage)
-                .join(chatMessage.sender)
-                .where(chatMessage.chatRoom.id.eq(chatRoomId),
-                        ltLostChatId(lastLostChatId)
-                )
-                .orderBy(chatMessage.id.desc())
-                .limit(pageable.getPageSize() + 1)
-                .fetch();
+    public Slice<ChatMessageDto> getChatsByLastLostChatId(final Long chatRoomId, final Long lastLostChatId, final Pageable pageable) {
+        List<ChatMessageDto> results = executeQuery(chatRoomId, lastLostChatId, pageable);
 
         boolean hasNext = false;
         if (results.size() > pageable.getPageSize()) {
@@ -40,7 +32,24 @@ public class ChatQueryRepositoryImpl implements ChatQueryRepository{
         return new SliceImpl<>(results, pageable, hasNext);
     }
 
+    private List<ChatMessageDto> executeQuery(final Long chatRoomId, final Long lastLostChatId, final Pageable pageable) {
+        return jpaQueryFactory.select(createQChatMessage())
+                .from(chatMessage)
+                .join(chatMessage.sender)
+                .where(chatMessage.chatRoom.id.eq(chatRoomId),
+                        ltLostChatId(lastLostChatId)
+                )
+                .orderBy(chatMessage.id.desc())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+    }
+
     private BooleanExpression ltLostChatId(Long lastChatId) {
         return lastChatId != null ? chatMessage.id.lt(lastChatId) : null;
+    }
+
+    private QChatMessageDto createQChatMessage() {
+        return new QChatMessageDto(chatMessage.id, chatMessage.sender.id,
+                chatMessage.sender.name, chatMessage.message, chatMessage.checked);
     }
 }

@@ -16,21 +16,12 @@ import static com.pesonal.FindDogPlz.post.domain.QLostPost.lostPost;
 
 @Repository
 @RequiredArgsConstructor
-public class LostPostQueryRepositoryImpl implements LostPostQueryRepository{
+public class LostPostQueryRepositoryImpl implements LostPostQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Slice<LostPostOutlineDto> searchByLastPostId(Long lastLostPostId, boolean close, Pageable pageable) {
-        List<LostPostOutlineDto> results = jpaQueryFactory
-                .select(new QLostPostOutlineDto(lostPost.id, lostPost.animalName, lostPost.lostLocation, lostPost.lostDate, lostPost.createdDate, lostPost.completed))
-                .from(lostPost)
-                .where(
-                        ltLostPostId(lastLostPostId),
-                        lostPost.completed.eq(close)
-                )
-                .orderBy(lostPost.id.desc())
-                .limit(pageable.getPageSize() + 1)
-                .fetch();
+    public Slice<LostPostOutlineDto> searchByLastPostId(final Long lastLostPostId, final boolean close, final Pageable pageable) {
+        List<LostPostOutlineDto> results = executeQuery(lastLostPostId, close, pageable);
 
         boolean hasNext = false;
         if (results.size() > pageable.getPageSize()) {
@@ -39,6 +30,24 @@ public class LostPostQueryRepositoryImpl implements LostPostQueryRepository{
         }
 
         return new SliceImpl<>(results, pageable, hasNext);
+    }
+
+    private List<LostPostOutlineDto> executeQuery(final Long lastLostPostId, final boolean close, final Pageable pageable) {
+        return jpaQueryFactory
+                .select(createQLostPost())
+                .from(lostPost)
+                .where(
+                        ltLostPostId(lastLostPostId),
+                        lostPost.completed.eq(close)
+                )
+                .orderBy(lostPost.id.desc())
+                .limit(pageable.getPageSize() + 1)
+                .fetch();
+    }
+
+    private QLostPostOutlineDto createQLostPost() {
+        return new QLostPostOutlineDto(lostPost.id, lostPost.animalName,
+                lostPost.lostLocation, lostPost.lostDate, lostPost.createdDate, lostPost.completed);
     }
 
     private BooleanExpression ltLostPostId(Long lostPostId) {

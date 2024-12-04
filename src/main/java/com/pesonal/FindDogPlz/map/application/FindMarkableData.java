@@ -21,20 +21,20 @@ public class FindMarkableData implements Markable {
     private final FindPostRepository findPostRepository;
 
     @Override
-    public List<MapDto> getMarkableData(Double longitude, Double latitude) {
+    public List<MapDto> getMarkableData(final Double longitude, final Double latitude) {
         String pointFormat = GeometryUtil.calculateAndFormatPoint(latitude, longitude);
         List<FindPost> findPostList = findFindPostByLocation(pointFormat);
         Location location = new Location(latitude, longitude);
         return convertToMapDtoList(findPostList, location);
     }
 
-    private List<FindPost> findFindPostByLocation(String pointFormat) {
+    private List<FindPost> findFindPostByLocation(final String pointFormat) {
         String queryStr = buildQueryString(pointFormat);
         Query query = entityManager.createNativeQuery(queryStr, FindPost.class);
         return query.getResultList();
     }
 
-    private String buildQueryString(String pointFormat) {
+    private String buildQueryString(final String pointFormat) {
         return String.format(
                 "SELECT * FROM find_post AS fp " +
                         "WHERE fp.completed = 0 and MBRContains(ST_LINESTRINGFROMTEXT(%s), fp.loc_point) " +
@@ -43,13 +43,13 @@ public class FindMarkableData implements Markable {
         );
     }
 
-    private List<MapDto> convertToMapDtoList(List<FindPost> findPostList, Location location) {
+    private List<MapDto> convertToMapDtoList(final List<FindPost> findPostList, final Location location) {
         return findPostList.stream()
                 .map(p -> convertFindPostToMapDto(p, location))
                 .toList();
     }
 
-    private MapDto convertFindPostToMapDto(FindPost findPost, Location location) {
+    private MapDto convertFindPostToMapDto(final FindPost findPost, final Location location) {
         Double dist = calcDist(location.getLongitude(), location.getLatitude(), findPost.getId());
         return MapDto.findPostBuilder()
                 .findPost(findPost)
@@ -57,7 +57,7 @@ public class FindMarkableData implements Markable {
                 .findPostBuild();
     }
 
-    private Double calcDist(Double longitude, Double latitude, Long findPostId) {
+    private Double calcDist(final Double longitude, final Double latitude, final Long findPostId) {
         Point point = PointParser.parsePoint(latitude, longitude);
         return point != null ? findPostRepository.findDistByPoint(point.getX(), point.getY(), findPostId) : null;
     }

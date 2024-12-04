@@ -14,8 +14,8 @@ public class MemberAdapter extends User {
 
     private final Member member;
 
-    public MemberAdapter(Member member){
-        super(member.getLoginId(),member.getPassword(), authorities(member.getRoles()));
+    public MemberAdapter(final Member member) {
+        super(member.getLoginId(), member.getPassword(), authorities(member.getRoles()));
         this.member = member;
     }
 

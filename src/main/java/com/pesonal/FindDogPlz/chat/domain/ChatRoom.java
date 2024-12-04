@@ -54,7 +54,7 @@ public class ChatRoom extends BaseDateEntity {
         this.member2 = invitee;
     }
 
-    public Member getReceiver(Long senderId) {
+    public Member getReceiver(final Long senderId) {
         return member1.getId().equals(senderId) ? member2 : member1;
     }
 

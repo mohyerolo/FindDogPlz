@@ -5,7 +5,6 @@ import com.pesonal.FindDogPlz.member.domain.Member;
 import com.pesonal.FindDogPlz.post.domain.LostPost;
 import com.pesonal.FindDogPlz.report.dto.ReportReqDto;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -17,7 +16,8 @@ import org.locationtech.jts.geom.Point;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Getter
 public class Report extends BaseDateEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -26,10 +26,10 @@ public class Report extends BaseDateEntity {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     private LostPost lostPost;
 
-    @NotBlank
+    @NotNull
     private String features;
 
-    @NotBlank
+    @NotNull
     private String findLocation;
 
     @NotNull
