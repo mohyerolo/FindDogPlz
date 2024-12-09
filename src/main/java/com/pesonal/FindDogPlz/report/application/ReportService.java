@@ -47,17 +47,9 @@ public class ReportService {
     @Transactional
     public void updateReport(final Long id, final ReportReqDto dto, final Member member) {
         Report report = findReport(id);
-        validateWriter(report.getWriter(), member);
+        validateWriter(report, member);
 
         report.updateReport(dto);
-        updateFindLocation(report, dto);
-    }
-
-    private void updateFindLocation(final Report report, final ReportReqDto dto) {
-        if (!report.getFindLocation().equals(dto.getFindLocation())) {
-            Point findPoint = parsePoint(dto.getFindLatitude(), dto.getFindLongitude());
-            report.updateLocation(dto.getFindLocation(), findPoint);
-        }
     }
 
     public Slice<ReportDto> getAllReportForLostPost(final Long postId, final Long lastReportId, final int size) {
@@ -68,7 +60,7 @@ public class ReportService {
     @Transactional
     public void deleteReport(final Long reportId, final Member reportWriter) {
         Report report = findReport(reportId);
-        validateWriter(report.getWriter(), reportWriter);
+        validateWriter(report, reportWriter);
 
         reportRepository.delete(report);
     }
@@ -76,7 +68,7 @@ public class ReportService {
     @Transactional
     public void excludeReportByLostPostWriter(final Long reportId, final Member lostPostWriter) {
         Report report = findReport(reportId);
-        validateWriter(report.getLostPost().getWriter(), lostPostWriter);
+        validateWriter(report, lostPostWriter);
 
         reportRepository.delete(report);
     }
@@ -90,8 +82,8 @@ public class ReportService {
         return PointParser.parsePoint(latitude, longitude);
     }
 
-    private void validateWriter(final Member writer, final Member member) {
-        if (!writer.getId().equals(member.getId())) {
+    private void validateWriter(final Report report, final Member member) {
+        if (report.isReporterDifferent(member)) {
             throw new AccessDeniedException("해당 작업이 가능한 사용자가 아닙니다.");
         }
     }

@@ -1,6 +1,7 @@
 package com.pesonal.FindDogPlz.report.domain;
 
 import com.pesonal.FindDogPlz.global.common.BaseDateEntity;
+import com.pesonal.FindDogPlz.global.util.PointParser;
 import com.pesonal.FindDogPlz.member.domain.Member;
 import com.pesonal.FindDogPlz.post.domain.LostPost;
 import com.pesonal.FindDogPlz.report.dto.ReportReqDto;
@@ -49,16 +50,31 @@ public class Report extends BaseDateEntity {
         this.includedInTimeline = false;
     }
 
-    public void updateReport(ReportReqDto dto) {
+    public void updateReport(final ReportReqDto dto) {
+        updateLocation(dto);
         this.features = dto.getFeatures();
     }
 
-    public void updateLocation(String location, Point point) {
-        this.findLocation = location;
-        this.point = point;
+    public void updateLocation(final ReportReqDto dto) {
+        if (isLocationUpdated(dto.getFindLocation())) {
+            this.point = PointParser.parsePoint(dto.getFindLatitude(), dto.getFindLongitude());;
+            this.findLocation = dto.getFindLocation();
+        }
+    }
+
+    private boolean isLocationUpdated(final String findLocation) {
+        return !this.findLocation.equals(findLocation);
     }
 
     public void includedInTimeLine() {
         this.includedInTimeline = true;
+    }
+
+    public boolean isReporterDifferent(final Member member) {
+        return writer.sameMember(member);
+    }
+
+    public void reflectReportLocationToPost() {
+        lostPost.updateFinalLocation(findLocation, point);
     }
 }

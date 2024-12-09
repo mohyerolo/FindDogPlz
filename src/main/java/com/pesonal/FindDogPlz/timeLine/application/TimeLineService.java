@@ -42,14 +42,9 @@ public class TimeLineService {
 
     private void updateRelatedDetails(final Report report, final boolean finalLoc) {
         if (finalLoc) {
-            updateLostPostLocation(report);
+            report.reflectReportLocationToPost();
         }
         report.includedInTimeLine();
-    }
-
-    private void updateLostPostLocation(final Report report) {
-        LostPost lostPost = report.getLostPost();
-        lostPost.updateFinalLocation(report.getFindLocation(), report.getPoint());
     }
 
     private Report findReport(final Long reportId) {
@@ -58,7 +53,7 @@ public class TimeLineService {
     }
 
     private void validateMemberIsLostPostWriter(final LostPost lostPost, final Member member) {
-        if (!lostPost.getWriter().getId().equals(member.getId())) {
+        if (lostPost.isWriterDifferent(member)) {
             throw new AccessDeniedException("해당 작업이 가능한 사용자가 아닙니다.");
         }
     }
