@@ -1,8 +1,6 @@
 package com.pesonal.FindDogPlz.post.api;
 
 import com.pesonal.FindDogPlz.global.auth.AuthMember;
-import com.pesonal.FindDogPlz.global.exception.CustomException;
-import com.pesonal.FindDogPlz.global.exception.ErrorCode;
 import com.pesonal.FindDogPlz.member.domain.Member;
 import com.pesonal.FindDogPlz.post.application.LostPostService;
 import com.pesonal.FindDogPlz.post.dto.LostPostDetailDto;
@@ -24,18 +22,12 @@ public class LostPostController {
 
     @PostMapping
     public ResponseEntity<String> createLostPost(@RequestBody @Valid LostPostReqDto dto, @AuthMember Member member) {
-        if (member == null) {
-            throw new CustomException(ErrorCode.AUTHENTICATION_ERROR);
-        }
         lostPostService.createLostPost(dto, member);
         return ResponseEntity.ok().body("완료");
     }
 
     @PutMapping
     public ResponseEntity<Long> updateLostPost(@RequestParam Long id, @RequestBody @Valid LostPostUpdateDto dto, @AuthMember Member member) {
-        if (member == null) {
-            throw new CustomException(ErrorCode.AUTHENTICATION_ERROR);
-        }
         return ResponseEntity.ok(lostPostService.updateLostPost(id, dto, member));
     }
 

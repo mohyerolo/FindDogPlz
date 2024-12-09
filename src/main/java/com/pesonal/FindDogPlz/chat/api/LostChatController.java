@@ -3,8 +3,6 @@ package com.pesonal.FindDogPlz.chat.api;
 import com.pesonal.FindDogPlz.chat.application.ChatService;
 import com.pesonal.FindDogPlz.chat.dto.ChatRoomWithMessageDto;
 import com.pesonal.FindDogPlz.global.auth.AuthMember;
-import com.pesonal.FindDogPlz.global.exception.CustomException;
-import com.pesonal.FindDogPlz.global.exception.ErrorCode;
 import com.pesonal.FindDogPlz.member.domain.Member;
 import com.pesonal.FindDogPlz.post.dto.PostType;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +21,6 @@ public class LostChatController {
 
     @PostMapping
     public ResponseEntity<ChatRoomWithMessageDto> enterChatRoom(@AuthMember Member sender, @RequestParam Long receiverId, @RequestParam Long lostPostId) {
-        if (sender == null) throw new CustomException(ErrorCode.AUTHENTICATION_ERROR);
         return ResponseEntity.ok(chatService.enterChatRoom(sender, receiverId, PostType.LOST, lostPostId));
     }
 }

@@ -21,14 +21,12 @@ public class ReportController {
 
     @PostMapping
     public ResponseEntity<String> createReport(@RequestParam Long postId, @RequestBody @Valid ReportReqDto dto, @AuthMember Member member) {
-        if (member == null) throw new CustomException(ErrorCode.AUTHENTICATION_ERROR);
         reportService.createReport(postId, dto, member);
         return ResponseEntity.ok().body("완료");
     }
 
     @PutMapping
     public ResponseEntity<String> updateReport(@RequestParam Long postId, @RequestBody @Valid ReportReqDto dto, @AuthMember Member member) {
-        if (member == null) throw new CustomException(ErrorCode.AUTHENTICATION_ERROR);
         reportService.updateReport(postId, dto, member);
         return ResponseEntity.ok().body("완료");
     }
@@ -41,14 +39,12 @@ public class ReportController {
 
     @DeleteMapping
     public ResponseEntity<String> deleteReport(@RequestParam Long reportId, @AuthMember Member reportWriter) {
-        if (reportWriter == null) throw new CustomException(ErrorCode.AUTHENTICATION_ERROR);
         reportService.deleteReport(reportId, reportWriter);
         return ResponseEntity.ok().body("완료");
     }
 
     @DeleteMapping("/exclude")
     public ResponseEntity<String> excludeReportByLostPostWriter(@RequestParam Long reportId, @AuthMember Member lostPostWriter) {
-        if (lostPostWriter == null) throw new CustomException(ErrorCode.AUTHENTICATION_ERROR);
         reportService.excludeReportByLostPostWriter(reportId, lostPostWriter);
         return ResponseEntity.ok().body("완료");
     }

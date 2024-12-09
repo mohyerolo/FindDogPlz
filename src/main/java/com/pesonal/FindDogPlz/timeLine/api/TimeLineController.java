@@ -20,7 +20,6 @@ public class TimeLineController {
 
     @PostMapping
     public ResponseEntity<String> includeReportInTheTimeline(@RequestParam Long reportId, @RequestParam boolean finalLoc, @AuthMember Member lostPostWriter) {
-        if (lostPostWriter == null) throw new CustomException(ErrorCode.AUTHENTICATION_ERROR);
         timeLineService.includeReportInTheTimeLine(reportId, finalLoc, lostPostWriter);
         return ResponseEntity.ok().body("완료");
     }

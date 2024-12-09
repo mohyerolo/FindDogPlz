@@ -22,14 +22,12 @@ public class FindPostController {
 
     @PostMapping
     public ResponseEntity<String> createFindPost(@RequestBody @Valid FindPostReqDto dto, @AuthMember Member member) {
-        if (member == null) throw new CustomException(ErrorCode.AUTHENTICATION_ERROR);
         findPostService.createFindPost(dto, member);
         return ResponseEntity.ok().body("완료");
     }
 
     @PutMapping
     public ResponseEntity<String> updateFindPost(@RequestParam Long id, @RequestBody @Valid FindPostReqDto dto, @AuthMember Member member) {
-        if (member == null) throw new CustomException(ErrorCode.AUTHENTICATION_ERROR);
         findPostService.updateFindPost(id, dto, member);
         return ResponseEntity.ok().body("완료");
     }
