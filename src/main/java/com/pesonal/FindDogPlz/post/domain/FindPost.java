@@ -2,6 +2,7 @@ package com.pesonal.FindDogPlz.post.domain;
 
 import com.pesonal.FindDogPlz.global.common.BaseDateEntity;
 import com.pesonal.FindDogPlz.global.common.Gender;
+import com.pesonal.FindDogPlz.global.util.PointParser;
 import com.pesonal.FindDogPlz.member.domain.Member;
 import com.pesonal.FindDogPlz.post.dto.FindPostReqDto;
 import jakarta.persistence.*;
@@ -65,6 +66,7 @@ public class FindPost extends BaseDateEntity {
     }
 
     public void updatePost(final FindPostReqDto dto) {
+        updateFindLocation(dto);
         this.features = dto.getFeatures();
         this.gender = dto.getGender();
         this.lead = dto.isLead();
@@ -72,12 +74,23 @@ public class FindPost extends BaseDateEntity {
         this.findDate = dto.getFindDate();
     }
 
-    public void updateFindLocation(final String location, final Point findPoint) {
-        this.location = location;
-        this.locPoint = findPoint;
+    private void updateFindLocation(final FindPostReqDto dto) {
+        if (isLocationUpdated(dto.getLocation())) {
+            this.locPoint = PointParser.parsePoint(dto.getFindLatitude(), dto.getFindLongitude());
+            this.location = dto.getLocation();
+        }
+    }
+
+    private boolean isLocationUpdated(final String location) {
+        return this.location.equals(location);
     }
 
     public void closePost() {
         this.completed = true;
     }
+
+    public boolean isWriterEqual(final Member member) {
+        return writer.sameMember(member);
+    }
+
 }

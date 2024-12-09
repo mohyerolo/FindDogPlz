@@ -2,7 +2,10 @@ package com.pesonal.FindDogPlz.post.domain;
 
 import com.pesonal.FindDogPlz.global.common.BaseDateEntity;
 import com.pesonal.FindDogPlz.global.common.Gender;
+import com.pesonal.FindDogPlz.global.util.PointParser;
 import com.pesonal.FindDogPlz.member.domain.Member;
+import com.pesonal.FindDogPlz.post.dto.FinalLocationUpdateDto;
+import com.pesonal.FindDogPlz.post.dto.LostLocationUpdateDto;
 import com.pesonal.FindDogPlz.post.dto.LostPostReqDto;
 import com.pesonal.FindDogPlz.post.dto.LostPostUpdateDto;
 import jakarta.persistence.*;
@@ -80,7 +83,40 @@ public class LostPost extends BaseDateEntity {
         this.completed = false;
     }
 
-    public void updatePostContent(LostPostUpdateDto dto) {
+    public void updateLostPost(final LostPostUpdateDto dto) {
+        updateLostLocation(dto.getLostLocationUpdateDto());
+        updateFinalLocation(dto.getFinalLocationUpdateDto());
+        updatePostContent(dto);
+    }
+
+    public void updateFinalLocation(final String finalLocation, final Point finalPoint) {
+        this.finalLocation = finalLocation;
+        this.finalPoint = finalPoint;
+    }
+
+    private void updateLostLocation(final LostLocationUpdateDto dto) {
+        if (isLostLocationUpdated(dto.getLostLocation())) {
+            this.lostPoint = PointParser.parsePoint(dto.getLatitude(), dto.getLongitude());
+            this.lostLocation = dto.getLostLocation();
+        }
+    }
+
+    private boolean isLostLocationUpdated(final String lostLocation) {
+        return !this.lostLocation.equals(lostLocation);
+    }
+
+    private void updateFinalLocation(final FinalLocationUpdateDto dto) {
+        if (isFinalLocationUpdated(dto.getFinalLocation())) {
+            this.finalPoint = PointParser.parsePoint(dto.getLatitude(), dto.getLongitude());
+            this.finalLocation = dto.getFinalLocation();
+        }
+    }
+
+    private boolean isFinalLocationUpdated(final String finalLocation) {
+        return !this.finalLocation.equals(finalLocation);
+    }
+
+    private void updatePostContent(final LostPostUpdateDto dto) {
         this.animalName = dto.getAnimalName();
         this.features = dto.getFeatures();
         this.gender = dto.getGender();
@@ -89,17 +125,12 @@ public class LostPost extends BaseDateEntity {
         this.lostDate = dto.getLostDate();
     }
 
-    public void updateLostLocation(String lostLocation, Point lostPoint) {
-        this.lostLocation = lostLocation;
-        this.lostPoint = lostPoint;
-    }
-
-    public void updateFinalLocation(String finalLocation, Point finalPoint) {
-        this.finalLocation = finalLocation;
-        this.finalPoint = finalPoint;
-    }
-
     public void closePost() {
         this.completed = true;
     }
+
+    public boolean isWriterDifferent(final Member member) {
+        return !writer.sameMember(member);
+    }
+
 }

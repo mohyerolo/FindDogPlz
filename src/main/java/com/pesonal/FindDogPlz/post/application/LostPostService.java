@@ -5,7 +5,10 @@ import com.pesonal.FindDogPlz.global.exception.ErrorCode;
 import com.pesonal.FindDogPlz.global.util.PointParser;
 import com.pesonal.FindDogPlz.member.domain.Member;
 import com.pesonal.FindDogPlz.post.domain.LostPost;
-import com.pesonal.FindDogPlz.post.dto.*;
+import com.pesonal.FindDogPlz.post.dto.LostPostDetailDto;
+import com.pesonal.FindDogPlz.post.dto.LostPostOutlineDto;
+import com.pesonal.FindDogPlz.post.dto.LostPostReqDto;
+import com.pesonal.FindDogPlz.post.dto.LostPostUpdateDto;
 import com.pesonal.FindDogPlz.post.repository.LostPostQueryRepository;
 import com.pesonal.FindDogPlz.post.repository.LostPostRepository;
 import lombok.RequiredArgsConstructor;
@@ -49,30 +52,12 @@ public class LostPostService {
 
     @Transactional
     public Long updateLostPost(final Long id, final LostPostUpdateDto dto, final Member member) {
-        LostPost lostPost = lostPostRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "수정하려는 공고를 찾을 수 없습니다."));
+        LostPost lostPost = lostPostRepository.findById(id)
+                .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "수정하려는 공고를 찾을 수 없습니다."));
+        validateWriter(lostPost, member);
 
-        validateWriter(lostPost.getWriter(), member);
-
-        updateLostLocation(lostPost, dto.getLostLocationUpdateDto());
-        updateFinalLocation(lostPost, dto.getFinalLocationUpdateDto());
-
-        lostPost.updatePostContent(dto);
-
+        lostPost.updateLostPost(dto);
         return lostPost.getId();
-    }
-
-    private void updateLostLocation(final LostPost lostPost, final LostLocationUpdateDto dto) {
-        if (!lostPost.getLostLocation().equals(dto.getLostLocation())) {
-            Point lostPoint = parsePoint(dto.getLatitude(), dto.getLongitude());
-            lostPost.updateLostLocation(dto.getLostLocation(), lostPoint);
-        }
-    }
-
-    private void updateFinalLocation(final LostPost lostPost, final FinalLocationUpdateDto dto) {
-        if (!lostPost.getFinalLocation().equals(dto.getFinalLocation())) {
-            Point finalPoint = parsePoint(dto.getLatitude(), dto.getLongitude());
-            lostPost.updateFinalLocation(dto.getFinalLocation(), finalPoint);
-        }
     }
 
     public Slice<LostPostOutlineDto> getAllLostPost(final Long lastLostPostId, final boolean close, final int size) {
@@ -92,7 +77,7 @@ public class LostPostService {
     @Transactional
     public void closeLostPost(final Long id, final Member member) {
         LostPost lostPost = lostPostRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "수정하려는 공고를 찾을 수 없습니다."));
-        validateWriter(lostPost.getWriter(), member);
+        validateWriter(lostPost, member);
         lostPost.closePost();
     }
 
@@ -100,8 +85,8 @@ public class LostPostService {
         return PointParser.parsePoint(latitude, longitude);
     }
 
-    private void validateWriter(final Member writer, final Member member) {
-        if (!writer.getId().equals(member.getId())) {
+    private void validateWriter(final LostPost lostPost, final Member member) {
+        if (lostPost.isWriterDifferent(member)) {
             throw new AccessDeniedException("해당 작업이 가능한 사용자가 아닙니다.");
         }
     }

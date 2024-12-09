@@ -38,17 +38,9 @@ public class FindPostService {
     @Transactional
     public void updateFindPost(final Long id, final FindPostReqDto dto, final Member member) {
         FindPost findPost = findPostRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "수정할 공고를 찾지 못했습니다."));
-        validateWriter(findPost.getWriter(), member);
+        validateWriter(findPost, member);
 
         findPost.updatePost(dto);
-        updateFindLocation(findPost, dto);
-    }
-
-    private void updateFindLocation(final FindPost findPost, final FindPostReqDto dto) {
-        if (!findPost.getLocation().equals(dto.getLocation())) {
-            Point findPoint = parsePoint(dto.getFindLatitude(), dto.getFindLongitude());
-            findPost.updateFindLocation(dto.getLocation(), findPoint);
-        }
     }
 
     public Slice<FindPostDto> getAllFindPost(final Long lastFindPostId, final boolean close, final int size) {
@@ -59,7 +51,7 @@ public class FindPostService {
     @Transactional
     public void closeFindPost(final Long id, final Member member) {
         FindPost findPost = findPostRepository.findById(id).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND, "수정할 공고를 찾지 못했습니다."));
-        validateWriter(findPost.getWriter(), member);
+        validateWriter(findPost, member);
         findPost.closePost();
     }
 
@@ -67,8 +59,8 @@ public class FindPostService {
         return PointParser.parsePoint(latitude, longitude);
     }
 
-    private void validateWriter(final Member writer, final Member member) {
-        if (!writer.getId().equals(member.getId())) {
+    private void validateWriter(final FindPost findPost, final Member member) {
+        if (!findPost.isWriterEqual(member)) {
             throw new AccessDeniedException("해당 작업이 가능한 사용자가 아닙니다.");
         }
     }
