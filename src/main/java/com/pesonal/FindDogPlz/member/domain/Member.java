@@ -47,4 +47,9 @@ public class Member extends BaseDateEntity {
         this.phone = signUpDto.getPhone();
         this.roles = Collections.singletonList("ROLE_USER");
     }
+
+    public boolean sameMember(final Member member) {
+        return id.equals(member.getId());
+    }
+
 }

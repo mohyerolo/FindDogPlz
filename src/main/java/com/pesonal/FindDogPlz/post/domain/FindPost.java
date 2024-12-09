@@ -89,8 +89,8 @@ public class FindPost extends BaseDateEntity {
         this.completed = true;
     }
 
-    public boolean isWriterEqual(final Member member) {
-        return writer.sameMember(member);
+    public boolean isWriterDifferent(final Member member) {
+        return !writer.sameMember(member);
     }
 
 }

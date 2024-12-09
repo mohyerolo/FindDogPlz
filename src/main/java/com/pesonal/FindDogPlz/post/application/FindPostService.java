@@ -60,7 +60,7 @@ public class FindPostService {
     }
 
     private void validateWriter(final FindPost findPost, final Member member) {
-        if (!findPost.isWriterEqual(member)) {
+        if (findPost.isWriterDifferent(member)) {
             throw new AccessDeniedException("해당 작업이 가능한 사용자가 아닙니다.");
         }
     }
