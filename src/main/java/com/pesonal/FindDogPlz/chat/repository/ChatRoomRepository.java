@@ -9,11 +9,20 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
-    @Query("SELECT l FROM ChatRoom l WHERE l.lostPost.id = :lostPostId " +
-            "AND ((l.member1.id = :senderId AND l.member2.id = :receiverId) " +
-            "OR (l.member1.id = :receiverId AND l.member2.id = :senderId))")
+    @Query("SELECT ch FROM ChatRoom ch WHERE ch.lostPost.id = :lostPostId " +
+            "AND ((ch.member1.id = :senderId AND ch.member2.id = :receiverId) " +
+            "OR (ch.member1.id = :receiverId AND ch.member2.id = :senderId))")
     Optional<ChatRoom> findByLostPostIdAndSenderAndReceiver(
             @Param("lostPostId") Long lostPostId,
+            @Param("senderId") Long senderId,
+            @Param("receiverId") Long receiverId
+    );
+
+    @Query("SELECT ch FROM ChatRoom ch WHERE ch.findPost.id = :findPostId " +
+            "AND ((ch.member1.id = :senderId AND ch.member2.id = :receiverId) " +
+            "OR (ch.member1.id = :receiverId AND ch.member2.id = :senderId))")
+    Optional<ChatRoom> findByFindPostIdAndSenderAndReceiver(
+            @Param("findPostId") Long findPostId,
             @Param("senderId") Long senderId,
             @Param("receiverId") Long receiverId
     );

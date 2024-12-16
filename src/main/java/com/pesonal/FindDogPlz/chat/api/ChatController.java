@@ -13,14 +13,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/chats/lost")
+@RequestMapping("/chats")
 @RequiredArgsConstructor
-public class LostChatController {
+public class ChatController {
 
     private final ChatService chatService;
 
     @PostMapping
-    public ResponseEntity<ChatRoomWithMessageDto> enterChatRoom(@AuthMember Member sender, @RequestParam Long receiverId, @RequestParam Long lostPostId) {
-        return ResponseEntity.ok(chatService.enterChatRoom(sender, receiverId, PostType.LOST, lostPostId));
+    public ResponseEntity<ChatRoomWithMessageDto> enterChatRoomUsingChatRoomId(@AuthMember Member sender, @RequestParam Long chatRoomId) {
+        return ResponseEntity.ok(chatService.enterChatRoom(sender, chatRoomId));
+    }
+
+    @PostMapping
+    public ResponseEntity<ChatRoomWithMessageDto> enterChatRoomUsingPost(@AuthMember Member sender, @RequestParam Long receiverId, @RequestParam PostType type, @RequestParam Long lostPostId) {
+        return ResponseEntity.ok(chatService.enterChatRoom(sender, receiverId, type, lostPostId));
     }
 }
