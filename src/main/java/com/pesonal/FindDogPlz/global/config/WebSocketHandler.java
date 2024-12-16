@@ -14,6 +14,7 @@ import org.springframework.web.socket.WebSocketSession;
 import org.springframework.web.socket.handler.TextWebSocketHandler;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -23,6 +24,17 @@ import java.util.concurrent.ConcurrentHashMap;
 public class WebSocketHandler extends TextWebSocketHandler {
     private final Map<Long, ConcurrentHashMap<String, WebSocketSession>> chatRoomSessionMap = new ConcurrentHashMap<>();
     private final ChatService chatService;
+
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+        MemberAdapter memberAdapter = (MemberAdapter) session.getAttributes().get("sender");
+        List<Long> chatRoomList = chatService.getAllChatRoomAsMember(memberAdapter.getMember());
+
+        for (Long id : chatRoomList) {
+            ConcurrentHashMap<String, WebSocketSession> chatRoomSessions = getChatRoomSessions(id);
+            chatRoomSessions.putIfAbsent(session.getId(), session);
+        }
+    }
 
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
@@ -43,7 +55,7 @@ public class WebSocketHandler extends TextWebSocketHandler {
         Long chatRoomId = chatMessageReqDto.getChatRoomId();
         ConcurrentHashMap<String, WebSocketSession> chatRoomSessions = getChatRoomSessions(chatRoomId);
 
-        MessageType messageType= chatMessageReqDto.getType();
+        MessageType messageType = chatMessageReqDto.getType();
         switch (messageType) {
             case ENTER -> chatRoomSessions.putIfAbsent(session.getId(), session);
             case CLOSE -> chatRoomSessions.remove(session.getId());
