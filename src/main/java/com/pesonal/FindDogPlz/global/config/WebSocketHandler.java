@@ -2,7 +2,6 @@ package com.pesonal.FindDogPlz.global.config;
 
 import com.pesonal.FindDogPlz.chat.application.ChatService;
 import com.pesonal.FindDogPlz.chat.dto.ChatMessageReqDto;
-import com.pesonal.FindDogPlz.chat.dto.MessageType;
 import com.pesonal.FindDogPlz.member.domain.MemberAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,6 +16,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -36,6 +36,10 @@ public class WebSocketHandler extends TextWebSocketHandler {
         }
     }
 
+    private ConcurrentHashMap<String, WebSocketSession> getChatRoomSessions(final Long chatRoomId) {
+        return chatRoomSessionMap.computeIfAbsent(chatRoomId, k -> new ConcurrentHashMap<>());
+    }
+
     @Override
     public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
         chatRoomSessionMap.forEach((chatRoomId, chatRoomSessions) -> {
@@ -47,36 +51,29 @@ public class WebSocketHandler extends TextWebSocketHandler {
     }
 
     @Override
-    protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
-        JSONObject jsonObject = new JSONObject(message.getPayload());
-        ChatMessageReqDto chatMessageReqDto = ChatMessageReqDto.toChatMessage(jsonObject);
+    protected void handleTextMessage(final WebSocketSession session, final TextMessage message) throws Exception {
+        ChatMessageReqDto chatMessageReqDto = ChatMessageReqDto.toChatMessage(new JSONObject(message.getPayload()));
         MemberAdapter memberAdapter = (MemberAdapter) session.getAttributes().get("sender");
 
-        Long chatRoomId = chatMessageReqDto.getChatRoomId();
-        ConcurrentHashMap<String, WebSocketSession> chatRoomSessions = getChatRoomSessions(chatRoomId);
+        List<WebSocketSession> chatRoomSessions = getSessionsWithoutSelf(chatMessageReqDto.getChatRoomId(), session.getId());
 
-        MessageType messageType = chatMessageReqDto.getType();
-        switch (messageType) {
-            case ENTER -> chatRoomSessions.putIfAbsent(session.getId(), session);
-            case CLOSE -> chatRoomSessions.remove(session.getId());
-            default -> {
-                chatService.saveMessage(chatMessageReqDto, memberAdapter.getMember());
-                sendMessageToChatRoom(jsonObject, chatRoomSessions);
-            }
-        }
+        chatService.saveMessage(chatMessageReqDto, memberAdapter.getMember());
+        sendMessageToChatRoom(message, chatRoomSessions);
     }
 
-    private ConcurrentHashMap<String, WebSocketSession> getChatRoomSessions(Long chatRoomId) {
-        return chatRoomSessionMap.computeIfAbsent(chatRoomId, k -> new ConcurrentHashMap<>());
+    private List<WebSocketSession> getSessionsWithoutSelf(final Long chatRoomId, final String sessionId) {
+        return getChatRoomSessions(chatRoomId).entrySet().stream()
+                .filter(entry -> !entry.getKey().equals(sessionId))
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
     }
 
-    private void sendMessageToChatRoom(JSONObject chatMessageDto, ConcurrentHashMap<String, WebSocketSession> chatRoomSessions) {
-        chatRoomSessions.forEach((key, value) -> {
-            TextMessage textMessage = new TextMessage(chatMessageDto.toString());
+    private void sendMessageToChatRoom(final TextMessage message, final List<WebSocketSession> chatRoomSessions) {
+        chatRoomSessions.forEach(session -> {
             try {
-                value.sendMessage(textMessage);
+                session.sendMessage(message);
             } catch (IOException e) {
-                log.error("Failed to send message: {}, error: {}", textMessage, e.getMessage());
+                log.error("Failed to send message: {}, error: {}", message, e.getMessage());
             }
         });
     }

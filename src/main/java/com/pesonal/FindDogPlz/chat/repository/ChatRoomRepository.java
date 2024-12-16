@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
@@ -16,4 +17,7 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
             @Param("senderId") Long senderId,
             @Param("receiverId") Long receiverId
     );
+
+    @Query("SELECT c FROM ChatRoom c WHERE c.member1.id = :memberId OR c.member2.id = :memberId")
+    List<ChatRoom> findByRelatedMember(@Param("memberId") Long memberId);
 }

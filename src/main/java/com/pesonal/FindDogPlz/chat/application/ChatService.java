@@ -22,6 +22,8 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ChatService {
@@ -31,6 +33,13 @@ public class ChatService {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRepository chatRepository;
     private final ChatQueryRepository chatQueryRepository;
+
+    public List<Long> getAllChatRoomAsMember(final Member sender) {
+        List<ChatRoom> allChatRoom = chatRoomRepository.findByRelatedMember(sender.getId());
+        return allChatRoom.stream()
+                .map(ChatRoom::getId)
+                .toList();
+    }
 
     @Transactional
     public ChatRoomWithMessageDto enterChatRoom(final Member sender, final Long receiverId, final PostType type, final Long postId) {

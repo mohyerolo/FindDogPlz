@@ -16,13 +16,9 @@ public class ChatMessageReqDto {
     @NotBlank
     private String message;
 
-    @NotNull
-    private MessageType type;
-
-    public static ChatMessageReqDto toChatMessage(JSONObject jsonObject) {
+    public static ChatMessageReqDto toChatMessage(final JSONObject jsonObject) {
         return ChatMessageReqDto.builder()
                 .chatRoomId(Long.parseLong(String.valueOf(jsonObject.getInt("chatRoomId"))))
-                .type(MessageType.valueOf(jsonObject.getString("type")))
                 .message(jsonObject.getString("message"))
                 .build();
     }
